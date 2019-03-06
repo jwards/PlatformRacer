@@ -2,30 +2,49 @@ package coms486.jsward.platformracer.game;
 
 public class Player {
 
-    //horizontal position on the level
-    private long position;
+    private float x;
+    private float y;
+    private float vx;
+    private float vy;
 
-    //vertical position
-    private float height;
+    private float speed;
 
-
-    private long speed;
-
-    public Player(long position,long speed){
-        this.position = position;
+    public Player(float x,float y,float speed){
         this.speed = speed;
+        this.x=x;
+        this.y=y;
 
     }
 
-    public long getPosition(){
-        return position;
+    public float getX(){
+        return x;
+    }
+    public float getY(){
+        return y;
     }
 
-    public void move(){
-
+    public float getVx(){
+        return vx;
     }
 
-    public void jump(){
+    public float getVy(){
+        return vy;
+    }
 
+    public float getSpeed(){
+        return speed;
+    }
+
+    public void setPosition(float x,float y){
+        this.x=x;
+        this.y=y;
+    }
+
+    public void setVx(float vx) {
+        this.vx = vx;
+    }
+
+    public void setVy(float vy){
+        this.vy = vy;
     }
 }

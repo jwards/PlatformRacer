@@ -6,7 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
-import coms486.jsward.platformracer.display.DisplayController;
+import coms486.jsward.platformracer.display.InputController;
 import coms486.jsward.platformracer.display.DisplayThread;
 import coms486.jsward.platformracer.display.GameDisplay;
 import coms486.jsward.platformracer.display.SVButton;
@@ -28,7 +28,7 @@ public class GameActivity extends AppCompatActivity {
             finish();
         }
 
-        DisplayController displayController = new DisplayController(gameDisplay);
+        InputController inputController = new InputController(gameDisplay);
         DisplayThread displayThread;
         displayThread = new DisplayThread(gameDisplay.getHolder(), gameDisplay);
 
@@ -40,9 +40,9 @@ public class GameActivity extends AppCompatActivity {
         Bitmap btnUp = Bitmap.createBitmap(buttonSprites, 200, 0, 100, 100);
 
         //TODO find comfortable place for buttons to be
-        gameDisplay.addButton(new SVButton(100,100,500,150,DisplayController.BUTTON_LEFT,btnLeft));
-        gameDisplay.addButton(new SVButton(100,100,300,200,DisplayController.BUTTON_RIGHT,btnRight));
-        gameDisplay.addButton(new SVButton(100,100,600,500,DisplayController.BUTTON_JUMP,btnUp));
+        gameDisplay.addButton(new SVButton(100,100,500,150,InputController.BUTTON_LEFT,btnLeft));
+        gameDisplay.addButton(new SVButton(100,100,300,200,InputController.BUTTON_RIGHT,btnRight));
+        gameDisplay.addButton(new SVButton(100,100,600,500,InputController.BUTTON_JUMP,btnUp));
 
 
         displayThread.start();
