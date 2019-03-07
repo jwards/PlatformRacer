@@ -4,19 +4,18 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.RectF;
-import android.view.View;
 
-public class SVButton {
+public class SVButton implements Drawable{
     private Matrix btnMatrix;
     private Matrix btnMatrixInverse;
     private RectF btnBox;
     private float width;
     private float height;
-    private int tag;
+    private long tag;
     Bitmap sprite;
 
 
-    public SVButton(float width, float height,float px,float py, int tag, Bitmap sprite){
+    public SVButton(float width, float height,float px,float py, long tag, Bitmap sprite){
         this.width = width;
         this.height = height;
         this.sprite = sprite;
@@ -26,6 +25,7 @@ public class SVButton {
         btnMatrixInverse = new Matrix();
         btnMatrix.invert(btnMatrixInverse);
         setPosition(px,py);
+
     }
 
     public boolean wasClicked(float[] pointDown,float[] pointUp){
@@ -41,16 +41,16 @@ public class SVButton {
         canvas.drawBitmap(sprite, btnMatrix, null);
     }
 
-    public void setTag(int tag){
+    public void setTag(long tag){
         this.tag = tag;
     }
 
-    public int getTag(){
+    public long getTag(){
         return tag;
     }
 
 
-    private boolean inButton(float[] point){
+    public boolean inButton(float[] point){
         btnMatrixInverse.mapPoints(point);
         return btnBox.contains(point[0],point[1]);
     }

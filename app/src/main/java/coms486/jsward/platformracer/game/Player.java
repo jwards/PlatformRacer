@@ -1,5 +1,7 @@
 package coms486.jsward.platformracer.game;
 
+
+
 public class Player {
 
     private float x;
@@ -13,7 +15,6 @@ public class Player {
         this.speed = speed;
         this.x=x;
         this.y=y;
-
     }
 
     public float getX(){
@@ -47,4 +48,9 @@ public class Player {
     public void setVy(float vy){
         this.vy = vy;
     }
+
+    public boolean isMoving(){
+        return vx==0 || vy == 0;
+    }
+
 }

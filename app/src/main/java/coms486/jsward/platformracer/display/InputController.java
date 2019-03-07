@@ -4,61 +4,51 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import coms486.jsward.platformracer.game.PlayerController;
+
+import static coms486.jsward.platformracer.game.PlayerController.BUTTON_JUMP;
+import static coms486.jsward.platformracer.game.PlayerController.BUTTON_LEFT;
+import static coms486.jsward.platformracer.game.PlayerController.BUTTON_RIGHT;
+
+
 public class InputController implements View.OnTouchListener {
     private static final String DEBUG_TAG = "DISPLAY_CONTROLLER";
+
     private GameDisplay gameDisplay;
+    private PlayerController playerController;
 
     private float[] pointDown = new float[2];
     private float[] pointUp = new float[2];
 
-    public static final int BUTTON_LEFT = 1;
-    public static final int BUTTON_RIGHT = 2;
-    public static final int BUTTON_JUMP = 3;
 
 
-    public InputController(GameDisplay gameDisplay){
+
+    public InputController(GameDisplay gameDisplay, PlayerController playerController){
         this.gameDisplay = gameDisplay;
+        this.playerController = playerController;
         gameDisplay.setOnTouchListener(this);
     }
 
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        int action = event.getAction();
-        switch (action) {
-            case MotionEvent.ACTION_DOWN:
-                pointDown[0] = event.getX();
-                pointDown[1] = event.getY();
-                return true;
-            case MotionEvent.ACTION_UP:
-                pointUp[0] = event.getX();
-                pointUp[1] = event.getY();
-                checkButtons();
-                return true;
-
+        pointDown[0] = event.getX();
+        pointDown[1] = event.getY();
+        checkButtons();
+        if (event.getAction() == MotionEvent.ACTION_UP) {
+            playerController.deactivate(~0);
         }
-        return false;
+        return true;
     }
 
-    private void onButtonClicked(int tag){
-        Log.d(DEBUG_TAG, "Button " + tag + " clicked.");
-        switch (tag){
-            case BUTTON_JUMP:
-
-                break;
-            case BUTTON_LEFT:
-
-                break;
-            case BUTTON_RIGHT:
-
-                break;
-        }
-    }
 
     private void checkButtons(){
         for (SVButton svb : gameDisplay.getButtons()) {
-            if(svb.wasClicked(pointDown, pointUp))
-                onButtonClicked(svb.getTag());
+            if(svb.inButton(pointDown)) {
+                playerController.activate(svb.getTag());
+            } else {
+                playerController.deactivate(svb.getTag());
+            }
         }
     }
 }

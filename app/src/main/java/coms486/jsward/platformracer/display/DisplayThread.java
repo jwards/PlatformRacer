@@ -7,19 +7,19 @@ import android.view.SurfaceView;
 
 public class DisplayThread extends Thread {
     private static final String DEBUG_TAG = "DISPLAY_THREAD";
-    public static final int MAX_FPS = 60;
+    public static final int MAX_FPS = 30;
     private double averageFPS;
     private final SurfaceHolder surfaceHolder;
-    private final GameDisplay gameDisplay;
+    private GameDrawer gameDrawer;
     private boolean running;
     private Object lock = new Object();
 
     private static Canvas canvas;
 
-    public DisplayThread(SurfaceHolder sh, GameDisplay gameDisplay) {
+    public DisplayThread(SurfaceHolder sh,GameDrawer gameDrawer) {
         super();
         this.surfaceHolder = sh;
-        this.gameDisplay = gameDisplay;
+        this.gameDrawer = gameDrawer;
         running = false;
     }
 
@@ -44,7 +44,8 @@ public class DisplayThread extends Thread {
                     synchronized (surfaceHolder) {
                         //don't try to draw if the view isn't on screen
                         if (canvas != null) {
-                            gameDisplay.draw(canvas);
+                            gameDrawer.draw(canvas);
+
                         }
 
                     }

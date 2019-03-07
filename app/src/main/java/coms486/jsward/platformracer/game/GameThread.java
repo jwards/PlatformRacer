@@ -3,36 +3,36 @@ package coms486.jsward.platformracer.game;
 import android.util.Log;
 
 public class GameThread extends Thread {
-    private static final String DEBUG_TAG = "DISPLAY_THREAD";
-    public static final int MAX_FPS = 60;
-    private double averageFPS;
+    private static final String DEBUG_TAG = "GAME_THREAD";
+    public static final int MAX_TPS = 30;
+    private double averageTPS;
     private boolean running;
 
+    private GameCore gameCore;
 
 
-    public GameThread() {
+    public GameThread(GameCore gameCore) {
         super();
-
         running = false;
+        this.gameCore = gameCore;
     }
 
     @Override
     public void run() {
 
         long startTime;
-        long timeMillis = 1000/MAX_FPS;
+        long timeMillis = 1000/ MAX_TPS;
         long waitTime;
-        int frameCount = 0;
+        int tickCount = 0;
         long totalTime = 0;
-        long targetTime = 1000/MAX_FPS;
+        long targetTime = 1000/ MAX_TPS;
 
         running = true;
         while(true){
             if(running) {
                 startTime = System.nanoTime();
 
-                //TODO
-                //tick
+                gameCore.tick();
 
                 timeMillis = (System.nanoTime() - startTime) / 1000000;
                 waitTime = targetTime - timeMillis;
@@ -46,12 +46,12 @@ public class GameThread extends Thread {
                 }
 
                 totalTime += System.nanoTime() - startTime;
-                frameCount++;
-                if (frameCount == MAX_FPS) {
-                    averageFPS = ((float)frameCount/totalTime)*.0000000001;
-                    frameCount = 0;
+                tickCount++;
+                if (tickCount == MAX_TPS) {
+                    averageTPS = ((float)tickCount/totalTime)*1000000000;
+                    tickCount = 0;
                     totalTime = 0;
-                    Log.d(DEBUG_TAG, "FPS: " + averageFPS);
+                    Log.d(DEBUG_TAG, "TPS: " + averageTPS);
                 }
             } else {
                 //wait here until game is resumed
