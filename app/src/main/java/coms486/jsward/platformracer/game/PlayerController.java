@@ -61,7 +61,7 @@ public class PlayerController {
 
     private void movex(float dvx){
         float vx;
-        vx = bound(p.getVx() + dvx, -10, 10);
+        vx = bound(p.getVx() + dvx, -2, 2);
         float x = p.getX();
         p.setVx(vx);
         p.setPosition(x + vx, p.getY());
@@ -69,7 +69,7 @@ public class PlayerController {
 
     private void movey(float dvy){
         float vy;
-        vy = bound(p.getVy() + dvy, -15, 15);
+        vy = bound(p.getVy() + dvy, -8, 8);
         p.setVy(vy);
         float y = p.getY();
         p.setPosition(p.getX(), y + vy);

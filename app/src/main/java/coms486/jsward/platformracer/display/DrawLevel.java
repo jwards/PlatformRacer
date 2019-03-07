@@ -8,12 +8,14 @@ import android.graphics.RectF;
 import android.util.Log;
 
 import coms486.jsward.platformracer.game.PlatformLevel;
+import coms486.jsward.platformracer.game.Player;
 
 public class DrawLevel implements Drawable {
 
     private static final String DEBUG_TAG = "DRAW_LEVEL";
 
     private PlatformLevel platformLevel;
+    private Player player;
     private Paint terrainPaint;
 
     private Matrix viewMatrix;
@@ -21,9 +23,9 @@ public class DrawLevel implements Drawable {
     private RectF levelBox;
     private RectF displayWindow;
 
-    public DrawLevel(PlatformLevel platformLevel){
+    public DrawLevel(PlatformLevel platformLevel,Player player){
         this.platformLevel = platformLevel;
-
+        this.player = player;
         terrainPaint = new Paint();
         terrainPaint.setColor(Color.GREEN);
         viewMatrix = new Matrix();
@@ -40,19 +42,25 @@ public class DrawLevel implements Drawable {
         int w = canvas.getWidth();
         int h = canvas.getHeight();
         displayWindow.set(0, 0, w, h);
-
         if (viewMatrix.setRectToRect(viewBox, displayWindow, Matrix.ScaleToFit.FILL)) {
             float[] pts1 = {0,0};
             float[] pts2 = {1, 50};
             float[] pts3 = {10,4};
             float[] pts4 = {12, 5};
+
+            float[] playerpt = {player.getX(), player.getY()};
+            viewMatrix.mapPoints(playerpt);
+            viewMatrix.postTranslate(0, -playerpt[0]);
+
             viewMatrix.mapPoints(pts1);
             viewMatrix.mapPoints(pts2);
             viewMatrix.mapPoints(pts3);
             viewMatrix.mapPoints(pts4);
 
+
             canvas.drawRect(pts1[1], pts1[0], pts2[1], pts2[0],terrainPaint);
             canvas.drawRect(pts3[1], pts3[0], pts4[1], pts4[0],terrainPaint);
+
 
 
         } else {

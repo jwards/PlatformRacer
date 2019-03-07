@@ -6,7 +6,7 @@ public class GameCore {
     private PlayerController playerController;
 
     public GameCore(){
-        player = new Player(100, 100, 4);
+        player = new Player(0, 1, .3f);
         playerController = new PlayerController(null, player);
     }
 

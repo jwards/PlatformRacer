@@ -65,7 +65,7 @@ public class GameActivity extends AppCompatActivity {
         }
 
         GameDrawer gameDrawer = new GameDrawer(gameDisplay);
-        gameDrawer.addDrawable(new DrawLevel(new PlatformLevel()));
+        gameDrawer.addDrawable(new DrawLevel(new PlatformLevel(),gameCore.getPlayer()));
         gameDrawer.addDrawable(new DrawPlayer(gameCore.getPlayer(),psprites));
 
 

@@ -11,11 +11,14 @@ import coms486.jsward.platformracer.game.Player;
 
 public class DrawPlayer implements Drawable{
 
+    public static final int PLAYER_X_OFFSET = 400;
+
     private ArrayList<Bitmap> sprite;
     private Matrix matrix;
     private RectF hitbox;
     private int animationFrame;
     private int counter;
+
 
 
     private Player player;
@@ -46,7 +49,7 @@ public class DrawPlayer implements Drawable{
             animationFrame = 0;
             counter = 0;
         }
-        matrix.setTranslate(player.getX(),player.getY());
+        matrix.setTranslate(PLAYER_X_OFFSET,player.getY());
         canvas.drawBitmap(sprite.get(animationFrame),matrix,null);
     }
 
