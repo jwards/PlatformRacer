@@ -4,6 +4,8 @@ import android.util.Log;
 
 public class GameThread extends Thread {
     private static final String DEBUG_TAG = "GAME_THREAD";
+    private static final boolean LOG_TPS = false;
+
     public static final int MAX_TPS = 30;
     private double averageTPS;
     private boolean running;
@@ -51,7 +53,7 @@ public class GameThread extends Thread {
                     averageTPS = ((float)tickCount/totalTime)*1000000000;
                     tickCount = 0;
                     totalTime = 0;
-                    Log.d(DEBUG_TAG, "TPS: " + averageTPS);
+                    if(LOG_TPS) Log.d(DEBUG_TAG, "TPS: " + averageTPS);
                 }
             } else {
                 //wait here until game is resumed

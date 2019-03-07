@@ -8,8 +8,8 @@ public class Player {
     private float y;
     private float vx;
     private float vy;
-
     private float speed;
+    private boolean canJump;
 
     public Player(float x,float y,float speed){
         this.speed = speed;
@@ -50,7 +50,19 @@ public class Player {
     }
 
     public boolean isMoving(){
-        return vx==0 || vy == 0;
+        return vx!=0;
+    }
+
+    public boolean isFalling(){
+        return vy<0;
+    }
+
+    public void setCanJump(boolean val){
+        canJump = val;
+    }
+
+    public boolean canJump(){
+        return canJump;
     }
 
 }

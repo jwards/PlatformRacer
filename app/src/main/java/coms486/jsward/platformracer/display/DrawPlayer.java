@@ -34,18 +34,20 @@ public class DrawPlayer implements Drawable{
     @Override
     public void draw(Canvas canvas) {
 
-        if (player.isMoving()) {
+        if (player.isFalling()) {
+            animationFrame = 3;
+        } else if (player.isMoving()) {
             counter++;
             if(counter>5){
                 counter = 0;
-                indexLooper(animationFrame + 1, 0, 2);
+                animationFrame = indexLooper(animationFrame + 1, 0, 2);
             }
         } else {
             animationFrame = 0;
             counter = 0;
         }
+        matrix.setTranslate(player.getX(),player.getY());
         canvas.drawBitmap(sprite.get(animationFrame),matrix,null);
-
     }
 
     private int indexLooper(int nextIndex,int lowerBound,int upperBound){

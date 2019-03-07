@@ -8,6 +8,7 @@ import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.List;
 public class GameDisplay extends SurfaceView implements SurfaceHolder.Callback {
 
     private List<SVButton> buttons;
+    private Paint background;
 
     public GameDisplay(Context context) {
         super(context);
@@ -33,11 +35,14 @@ public class GameDisplay extends SurfaceView implements SurfaceHolder.Callback {
 
     private void init(Context context){
         buttons = new LinkedList<>();
+        background = new Paint();
+        background.setColor(Color.GRAY);
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         getHolder().addCallback(this);
+
     }
 
     @Override
@@ -62,7 +67,7 @@ public class GameDisplay extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void draw(final Canvas canvas) {
         super.draw(canvas);
-
+        canvas.drawRect(0,0,canvas.getWidth(),canvas.getHeight(),background);
     }
 
     public void drawUI(Canvas canvas){

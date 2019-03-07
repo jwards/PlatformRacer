@@ -7,6 +7,9 @@ import android.view.SurfaceView;
 
 public class DisplayThread extends Thread {
     private static final String DEBUG_TAG = "DISPLAY_THREAD";
+    private static final boolean LOG_FPS = false;
+
+
     public static final int MAX_FPS = 30;
     private double averageFPS;
     private final SurfaceHolder surfaceHolder;
@@ -80,7 +83,7 @@ public class DisplayThread extends Thread {
                     averageFPS = ((float)frameCount/(float)totalTime)*1000000000;
                     frameCount = 0;
                     totalTime = 0;
-                    Log.d(DEBUG_TAG, "FPS: " + averageFPS);
+                    if (LOG_FPS) Log.d(DEBUG_TAG, "FPS: " + averageFPS);
                 }
             } else {
                 //wait here until game is resumed

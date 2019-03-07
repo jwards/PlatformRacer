@@ -17,6 +17,7 @@ import coms486.jsward.platformracer.display.GameDisplay;
 import coms486.jsward.platformracer.display.SVButton;
 import coms486.jsward.platformracer.game.GameCore;
 import coms486.jsward.platformracer.game.GameThread;
+import coms486.jsward.platformracer.game.PlatformLevel;
 import coms486.jsward.platformracer.game.Player;
 import coms486.jsward.platformracer.game.PlayerController;
 
@@ -64,7 +65,7 @@ public class GameActivity extends AppCompatActivity {
         }
 
         GameDrawer gameDrawer = new GameDrawer(gameDisplay);
-        gameDrawer.addDrawable(new DrawLevel());
+        gameDrawer.addDrawable(new DrawLevel(new PlatformLevel()));
         gameDrawer.addDrawable(new DrawPlayer(gameCore.getPlayer(),psprites));
 
 
