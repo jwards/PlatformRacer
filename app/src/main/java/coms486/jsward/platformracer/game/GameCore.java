@@ -5,9 +5,9 @@ public class GameCore {
     private Player player;
     private PlayerController playerController;
 
-    public GameCore(){
-        player = new Player(0, 1, .3f);
-        playerController = new PlayerController(null, player);
+    public GameCore(PlatformLevel platformLevel){
+        player = new Player(0, 1, 1f,6f,3f,-15f);
+        playerController = new PlayerController(platformLevel, player);
     }
 
     public PlayerController getPlayerController(){

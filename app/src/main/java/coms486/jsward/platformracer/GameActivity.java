@@ -9,7 +9,6 @@ import android.util.Log;
 import java.util.ArrayList;
 
 import coms486.jsward.platformracer.display.DrawLevel;
-import coms486.jsward.platformracer.display.DrawPlayer;
 import coms486.jsward.platformracer.display.GameDrawer;
 import coms486.jsward.platformracer.display.InputController;
 import coms486.jsward.platformracer.display.DisplayThread;
@@ -18,7 +17,6 @@ import coms486.jsward.platformracer.display.SVButton;
 import coms486.jsward.platformracer.game.GameCore;
 import coms486.jsward.platformracer.game.GameThread;
 import coms486.jsward.platformracer.game.PlatformLevel;
-import coms486.jsward.platformracer.game.Player;
 import coms486.jsward.platformracer.game.PlayerController;
 
 public class GameActivity extends AppCompatActivity {
@@ -38,23 +36,13 @@ public class GameActivity extends AppCompatActivity {
             finish();
         }
 
-        GameCore gameCore = new GameCore();
+
+        PlatformLevel platformLevel = new PlatformLevel();
+        GameCore gameCore = new GameCore(platformLevel);
         GameThread gameThread = new GameThread(gameCore);
         InputController inputController = new InputController(gameDisplay,gameCore.getPlayerController());
 
-
-
-        //load button sprites
-        Bitmap buttonSprites = BitmapUtil.getBitmapFromAsset(this, "dir_buttons.png");
-
-        Bitmap btnRight = Bitmap.createBitmap(buttonSprites, 0, 0, 99, 99);
-        Bitmap btnLeft = Bitmap.createBitmap(buttonSprites, 99, 0, 99, 99);
-        Bitmap btnUp = Bitmap.createBitmap(buttonSprites, 198, 0, 99, 99);
-
-        //TODO make button location relative to screen size
-        gameDisplay.addButton(new SVButton(100,100,200,850,PlayerController.BUTTON_LEFT,btnLeft));
-        gameDisplay.addButton(new SVButton(100,100,400,850,PlayerController.BUTTON_RIGHT,btnRight));
-        gameDisplay.addButton(new SVButton(100,100,1800,850,PlayerController.BUTTON_JUMP,btnUp));
+        initDisplayButtons(gameDisplay);
 
         //load player sprites
         Bitmap playerSprite = BitmapUtil.getBitmapFromAsset(this, "player_sprite.png");
@@ -65,14 +53,28 @@ public class GameActivity extends AppCompatActivity {
         }
 
         GameDrawer gameDrawer = new GameDrawer(gameDisplay);
-        gameDrawer.addDrawable(new DrawLevel(new PlatformLevel(),gameCore.getPlayer()));
-        gameDrawer.addDrawable(new DrawPlayer(gameCore.getPlayer(),psprites));
+        DrawLevel levelDrawer = new DrawLevel(gameCore.getPlayer(), psprites);
+        gameDrawer.addDrawable(levelDrawer);
 
 
         DisplayThread displayThread = new DisplayThread(gameDisplay.getHolder(), gameDrawer);
         displayThread.start();
         gameThread.start();
 
+    }
+
+    private void initDisplayButtons(GameDisplay gameDisplay){
+        //load button sprites
+        Bitmap buttonSprites = BitmapUtil.getBitmapFromAsset(this, "dir_buttons.png");
+
+        Bitmap btnRight = Bitmap.createBitmap(buttonSprites, 0, 0, 99, 99);
+        Bitmap btnLeft = Bitmap.createBitmap(buttonSprites, 99, 0, 99, 99);
+        Bitmap btnUp = Bitmap.createBitmap(buttonSprites, 198, 0, 99, 99);
+
+        //TODO make button location relative to screen size
+        gameDisplay.addButton(new SVButton(150,150,100,950,PlayerController.BUTTON_LEFT,btnLeft));
+        gameDisplay.addButton(new SVButton(150,150,300,950,PlayerController.BUTTON_RIGHT,btnRight));
+        gameDisplay.addButton(new SVButton(150,150,1800,950,PlayerController.BUTTON_JUMP,btnUp));
     }
 
 

@@ -8,11 +8,19 @@ public class Player {
     private float y;
     private float vx;
     private float vy;
-    private float speed;
+    private float accel;
+    private float maxFallSpeed;
+    private float maxJumpSpeed;
+    private float maxSpeedX;
     private boolean canJump;
 
-    public Player(float x,float y,float speed){
-        this.speed = speed;
+
+
+    public Player(float x,float y,float accel,float maxSpeedX,float maxFallSpeed,float maxJumpSpeed){
+        this.accel = accel;
+        this.maxSpeedX = maxSpeedX;
+        this.maxFallSpeed = maxFallSpeed;
+        this.maxJumpSpeed = maxJumpSpeed;
         this.x=x;
         this.y=y;
     }
@@ -32,8 +40,8 @@ public class Player {
         return vy;
     }
 
-    public float getSpeed(){
-        return speed;
+    public float getAccel(){
+        return accel;
     }
 
     public void setPosition(float x,float y){
@@ -42,11 +50,11 @@ public class Player {
     }
 
     public void setVx(float vx) {
-        this.vx = vx;
+        this.vx = bound(vx,-maxSpeedX,maxSpeedX);
     }
 
     public void setVy(float vy){
-        this.vy = vy;
+        this.vy = bound(vy, maxJumpSpeed, maxFallSpeed);
     }
 
     public boolean isMoving(){
@@ -54,7 +62,7 @@ public class Player {
     }
 
     public boolean isFalling(){
-        return vy<0;
+        return vy>2;
     }
 
     public void setCanJump(boolean val){
@@ -63,6 +71,16 @@ public class Player {
 
     public boolean canJump(){
         return canJump;
+    }
+
+    private float bound(float test,float lb,float ub){
+        if(test<lb){
+            return lb;
+        }
+        if(test>ub){
+            return ub;
+        }
+        return test;
     }
 
 }

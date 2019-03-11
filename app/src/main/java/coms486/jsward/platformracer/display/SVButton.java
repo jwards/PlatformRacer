@@ -2,7 +2,9 @@ package coms486.jsward.platformracer.display;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.graphics.RectF;
 
 public class SVButton implements Drawable{
@@ -20,11 +22,15 @@ public class SVButton implements Drawable{
         this.height = height;
         this.sprite = sprite;
         this.tag=tag;
-        btnBox = new RectF(0, 0, width, height);
+        btnBox = new RectF(0, 0, sprite.getWidth(), sprite.getHeight());
         btnMatrix = new Matrix();
         btnMatrixInverse = new Matrix();
         btnMatrix.invert(btnMatrixInverse);
-        setPosition(px,py);
+
+        float sx,sy;
+        sx = width/sprite.getWidth();
+        sy = height / sprite.getHeight();
+        setPosition(px,py,sx,sy);
 
     }
 
@@ -32,8 +38,9 @@ public class SVButton implements Drawable{
         return inButton(pointDown)&&inButton(pointUp);
     }
 
-    public void setPosition(float x,float y) {
+    public void setPosition(float x,float y,float sx,float sy) {
         btnMatrix.setTranslate(x, y);
+        btnMatrix.preScale(sx, sy);
         btnMatrix.mapRect(btnBox);
     }
 
