@@ -10,6 +10,11 @@ import java.util.ArrayList;
 
 public class PlatformLevel {
 
+    private static final int UP = 0;
+    private static final int DOWN = 1;
+    private static final int LEFT = 2;
+    private static final int RIGHT = 3;
+
     private int sizex = 1000;
     private int sizey = 150;
 
@@ -62,10 +67,10 @@ public class PlatformLevel {
             for(int obj = 0;obj<levelObjects.size()&& !collisionX && !collisionYBottom && !collisionYTop; obj++) {
                 //0:up 1:down 2:left 3:right
                 for (int dir = 0; dir < 4; dir++) {
-                    if (dir == 0 && nextdy > 0) continue;
-                    if (dir == 1 && nextdy < 0) continue;
-                    if (dir == 2 && nextdx > 0) continue;
-                    if (dir == 3 && nextdx < 0) continue;
+                    if (dir == UP && nextdy > 0) continue;
+                    if (dir == DOWN && nextdy < 0) continue;
+                    if (dir == LEFT && nextdx > 0) continue;
+                    if (dir == RIGHT && nextdx < 0) continue;
                     projdx = projdy = 0;
 
                     vectorLength = (float) Math.sqrt(nextdx * nextdx + nextdy * nextdy);
@@ -98,18 +103,20 @@ public class PlatformLevel {
             for (int obj = 0; obj < levelObjects.size() && !collisionX && !collisionYBottom && !collisionYTop; obj++) {
                 //0:up 1:down 2:left 3:right
                 for (int dir = 0; dir < 4; dir++) {
-                    if (dir == 1 && nextdy < 0) continue;
-                    if (dir == 2 && nextdx > 0) continue;
-                    if (dir == 3 && nextdx < 0) continue;
+                    if (dir == DOWN && nextdy < 0) continue;
+                    if (dir == LEFT && nextdx > 0) continue;
+                    if (dir == RIGHT && nextdx < 0) continue;
+                    //Left or Right
                     projdx = (dir >= 2 ? nextdx : 0);
+                    //Up or down
                     projdy = (dir < 2 ? nextdy : 0);
 
                     while(levelObjects.get(obj).contains(playerHitbox[dir*4] + p.getX() + projdx,playerHitbox[dir*4+1] +p.getY()+projdy)
                         || levelObjects.get(obj).contains(playerHitbox[dir*4+2] + p.getX() + projdx,playerHitbox[dir*4+3] +p.getY()+projdy)){
-                        if (dir == 0) ++projdy;
-                        if(dir == 1) --projdy;
-                        if(dir == 2) ++projdx;
-                        if(dir == 3) --projdx;
+                        if (dir == UP) ++projdy;
+                        if(dir == DOWN) --projdy;
+                        if(dir == LEFT) ++projdx;
+                        if(dir == RIGHT) --projdx;
                     }
 
                     if(dir>= 2 && dir <= 3) nextdx = projdx;

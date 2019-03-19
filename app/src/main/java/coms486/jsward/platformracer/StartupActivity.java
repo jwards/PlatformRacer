@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import coms486.jsward.platformracer.network.ConnectionTest;
+
 public class StartupActivity extends AppCompatActivity {
 
     @Override
@@ -19,9 +21,13 @@ public class StartupActivity extends AppCompatActivity {
         Button leaderButton = findViewById(R.id.startup_leaderboard);
         leaderButton.setTag(2);
 
+        Button testButton = findViewById(R.id.startup_test);
+        testButton.setTag(3);
+
         ButtonListener buttonListener = new ButtonListener();
         startButton.setOnClickListener(buttonListener);
         leaderButton.setOnClickListener(buttonListener);
+        testButton.setOnClickListener(buttonListener);
 
     }
 
@@ -42,6 +48,10 @@ public class StartupActivity extends AppCompatActivity {
                 case 2:
                     //open leaderboards
                     //TODO
+                    break;
+                case 3:
+                    //test
+                    launch(ConnectionTest.class);
                     break;
             }
         }

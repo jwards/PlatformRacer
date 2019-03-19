@@ -26,6 +26,7 @@ public class DrawLevel implements Drawable {
             22, 31, 22, 109,   //LEFT ARM
             71, 31, 71, 109   //RIGHT ARM
     };
+    
     private float[] transformedHitbox = new float[playerHitbox.length];
 
 
