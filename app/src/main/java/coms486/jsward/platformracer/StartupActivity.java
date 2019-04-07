@@ -6,8 +6,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-import coms486.jsward.platformracer.network.ConnectionTest;
-
 public class StartupActivity extends AppCompatActivity {
 
     @Override
@@ -43,7 +41,7 @@ public class StartupActivity extends AppCompatActivity {
             switch ((int)v.getTag()){
                 case 1:
                     //start game
-                    launch(GameActivity.class);
+                    launch(GameSelectActivity.class);
                     break;
                 case 2:
                     //open leaderboards
@@ -51,7 +49,6 @@ public class StartupActivity extends AppCompatActivity {
                     break;
                 case 3:
                     //test
-                    launch(ConnectionTest.class);
                     break;
             }
         }

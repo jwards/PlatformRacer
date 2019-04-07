@@ -5,33 +5,54 @@ import android.util.Log;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
+import java.util.function.ObjIntConsumer;
 
-public class RecieveSocket implements Runnable {
+import coms486.jsward.platformracer.AndroidLogger;
+import jsward.platformracer.common.util.TickerThread;
+import jsward.platformracer.common.game.GameCore;
+import jsward.platformracer.common.network.GameUpdatePacket;
+
+public class RecieveSocket extends TickerThread {
 
     private static final String DEBUG_TAG = "RECIEVE_SOCKET";
 
-    public static final int SERVER_PORT = 14914;
+    private ObjectInputStream input;
 
-    public RecieveSocket(){
+    private GameCore gameCore;
 
+    public RecieveSocket(int maxTPS, ObjectInputStream objectInputStream, GameCore gameCore) throws IOException {
+        super(maxTPS,true,new AndroidLogger());
+        this.gameCore = gameCore;
+        input = objectInputStream;
+
+    }
+
+    private void readUpdate(){
+        GameUpdatePacket gup = null;
+        try {
+            Object obj = input.readObject();
+            if (obj != null) {
+                if (obj instanceof GameUpdatePacket) {
+                    gup = (GameUpdatePacket) obj;
+                    gameCore.update(gup);
+                } else {
+                    Log.d(DEBUG_TAG, "Error: received unexpected object type");
+                }
+            } else {
+                Log.d(DEBUG_TAG, "Error: received null object");
+            }
+        } catch (ClassNotFoundException e) {
+            Log.d(DEBUG_TAG, Log.getStackTraceString(e));
+            hault();
+        } catch (IOException e) {
+            Log.d(DEBUG_TAG, Log.getStackTraceString(e));
+            hault();
+        }
     }
 
     @Override
-    public void run() {
-
-        try {
-            Socket cs = new Socket("192.168.1.30",SERVER_PORT);
-            ObjectInputStream input = new ObjectInputStream(cs.getInputStream());
-            while(true){
-                Object obj = input.readObject();
-                Log.d(DEBUG_TAG, "Recieved: " + obj.toString());
-            }
-
-        } catch (IOException e) {
-            Log.d(DEBUG_TAG, Log.getStackTraceString(e));
-        } catch (ClassNotFoundException e) {
-            Log.d(DEBUG_TAG, Log.getStackTraceString(e));
-        }
-
+    protected void tick() {
+        readUpdate();
     }
+
 }

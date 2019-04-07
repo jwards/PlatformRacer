@@ -1,10 +1,4 @@
-package coms486.jsward.platformracer.game;
-
-import android.graphics.Color;
-import android.graphics.Matrix;
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.RectF;
+package jsward.platformracer.common.game;
 
 import java.util.ArrayList;
 
@@ -18,7 +12,7 @@ public class PlatformLevel {
     private int sizex = 1000;
     private int sizey = 150;
 
-    private ArrayList<RectF> levelObjects;
+    private ArrayList<RectangleF> levelObjects;
     private float[] playerHitbox = {
             4.7687864f, 1.9444445f,
             8.670521f, 1.9444445f,
@@ -164,7 +158,7 @@ public class PlatformLevel {
 
     private void loadLevelObjects(float[] pts){
         for (int i = 0; i < pts.length; i=i+4) {
-            levelObjects.add(new RectF(pts[i+0], pts[i+1], pts[i+2], pts[i+3]));
+            levelObjects.add(new RectangleF(pts[i+0], pts[i+1], pts[i+2], pts[i+3]));
         }
     }
 

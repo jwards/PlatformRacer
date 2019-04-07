@@ -1,6 +1,5 @@
-package coms486.jsward.platformracer.game;
+package jsward.platformracer.common.game;
 
-import android.util.Log;
 
 public class PlayerController {
 
@@ -24,7 +23,7 @@ public class PlayerController {
         this.p = p;
     }
 
-    public void update(){
+    public void tick(){
 
         p.setVy(p.getVy()+GRAVITY);
 
@@ -41,10 +40,17 @@ public class PlayerController {
             p.setVx(decay(p.getVx()));
         }
 
-
-        //update position
+        //tick position
         level.detectCollision(p);
 
+    }
+
+    public long getControlsActive(){
+        return controlsActive;
+    }
+
+    public void setControlsActive(long controlsActive){
+        this.controlsActive = controlsActive;
     }
 
 

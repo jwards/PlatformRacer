@@ -1,16 +1,9 @@
 package coms486.jsward.platformracer.display;
 
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
-import java.util.Hashtable;
-import java.util.LinkedList;
-
-import coms486.jsward.platformracer.game.PlayerController;
-
-import static coms486.jsward.platformracer.game.PlayerController.BUTTON_NULL;
-
+import jsward.platformracer.common.game.PlayerController;
 
 public class InputController implements View.OnTouchListener {
     private static final String DEBUG_TAG = "DISPLAY_CONTROLLER";

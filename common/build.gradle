@@ -1,0 +1,22 @@
+apply plugin: 'java-library'
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+}
+
+task deleteJar(type: Delete){
+    delete 'libs/jars/platformracercommon.jar'
+}
+
+task createJar(type: Copy) {
+    from('build/intermediates/bundles/release/')
+    into('libs/jars/')
+    include('classes.jar')
+    rename('classes.jar', 'platformracercommon.jar')
+}
+
+createJar.dependsOn(deleteJar, build)
+
+
+sourceCompatibility = "7"
+targetCompatibility = "7"

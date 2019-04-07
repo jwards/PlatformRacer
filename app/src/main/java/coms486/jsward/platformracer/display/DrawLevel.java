@@ -10,8 +10,8 @@ import android.util.Log;
 
 import java.util.ArrayList;
 
-import coms486.jsward.platformracer.game.PlatformLevel;
-import coms486.jsward.platformracer.game.Player;
+import jsward.platformracer.common.game.PlatformLevel;
+import jsward.platformracer.common.game.Player;
 
 public class DrawLevel implements Drawable {
 
@@ -19,7 +19,7 @@ public class DrawLevel implements Drawable {
     public static final int PLAYER_X_OFFSET = 600;
 
     //hitbox for the current sprite
-    //need to update this if sprite changes/ sprite is scaled differently
+    //need to tick this if sprite changes/ sprite is scaled differently
     private float[] playerHitbox = {
             33, 14, 60, 14,   //HEAD
             33, 135, 60, 135, //FEET
@@ -48,7 +48,7 @@ public class DrawLevel implements Drawable {
 
 
     //1080x2076
-    public DrawLevel(Player player,ArrayList<Bitmap> playerSprite){
+    public DrawLevel(Player player, ArrayList<Bitmap> playerSprite){
         this.player = player;
         this.playerSprite = playerSprite;
 
