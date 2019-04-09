@@ -3,4 +3,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/game_select_frame">
+
+
+    <fragment  android:name="coms486.jsward.platformracer.GameSelectViewFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    </fragment>
+
+
 </FrameLayout>

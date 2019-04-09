@@ -20,7 +20,18 @@
         android:text="Create Game"
         />
 
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="80"
+        android:id="@+id/game_mode_lobby_frame">
 
+        <fragment android:name="coms486.jsward.platformracer.LobbyViewFragment"
+            android:id="@+id/fragment_lobby_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
+        </fragment>
+    </FrameLayout>
 
 </LinearLayout>

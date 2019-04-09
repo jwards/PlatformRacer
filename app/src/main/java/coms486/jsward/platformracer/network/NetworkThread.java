@@ -17,6 +17,8 @@ public class NetworkThread extends Thread {
 
     private static final String DEBUG_TAG = "NETWORK_THREAD";
 
+    private static final String SERVER_ADDR  = "desktop-93rq231.student.iastate.edu";
+
     private Socket socket;
     private ObjectInputStream objectInputStream;
     private ObjectOutputStream objectOutputStream;
@@ -41,7 +43,7 @@ public class NetworkThread extends Thread {
 
     private void initNetwork(){
         try{
-            Socket sock = new Socket("192.168.1.30", SERVER_PORT);
+            Socket sock = new Socket(SERVER_ADDR, SERVER_PORT);
             objectOutputStream = new ObjectOutputStream(sock.getOutputStream());
             objectInputStream = new ObjectInputStream(sock.getInputStream());
 
