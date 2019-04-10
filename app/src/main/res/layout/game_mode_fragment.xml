@@ -14,24 +14,17 @@
 
     <Button
         android:layout_width="wrap_content"
+        android:id="@+id/game_mode_mp_btn"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:id="@+id/game_mode_mp_btn"
-        android:text="Create Game"
-        />
+        android:text="Create Game" />
 
-    <FrameLayout
+    <fragment
+        android:id="@+id/fragment_lobby_view"
+        android:name="coms486.jsward.platformracer.LobbyViewFragment"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="80"
-        android:id="@+id/game_mode_lobby_frame">
+        android:layout_height="500dp">
 
-        <fragment android:name="coms486.jsward.platformracer.LobbyViewFragment"
-            android:id="@+id/fragment_lobby_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-        </fragment>
-    </FrameLayout>
+    </fragment>
 
 </LinearLayout>

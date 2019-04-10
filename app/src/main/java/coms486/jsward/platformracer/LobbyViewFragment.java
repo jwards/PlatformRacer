@@ -21,9 +21,14 @@ public class LobbyViewFragment extends Fragment  {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.game_lobby_fragment, container, false);
-
         lobbyList = view.findViewById(R.id.game_lobby_list);
+        listAdapter = new LobbyListAdapter(getContext());
+        lobbyList.setAdapter(listAdapter);
 
-        return super.onCreateView(inflater, container, savedInstanceState);
+        return view;
+    }
+
+    public LobbyListAdapter getListAdapter(){
+        return listAdapter;
     }
 }

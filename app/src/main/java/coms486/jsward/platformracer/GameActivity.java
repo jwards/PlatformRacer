@@ -1,5 +1,6 @@
 package coms486.jsward.platformracer;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -33,6 +34,9 @@ public class GameActivity extends AppCompatActivity {
 
     private static final String DEBUG_TAG = "GAME_ACTIVITY";
 
+    public static final String FLAG_SINGLEPLAYER = "GameActivity.FLAG_SINGLEPLAYER";
+    private boolean isSinglePlayer;
+
     private GameCore gameCore;
     private GameThread gameThread;
 
@@ -45,6 +49,8 @@ public class GameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
+
+
         //initialize the display
         gameDisplay = findViewById(R.id.gameDisplay);
 
@@ -53,23 +59,31 @@ public class GameActivity extends AppCompatActivity {
             finish();
         }
 
+        readIntent(getIntent());
+
+        if(!isSinglePlayer){
+            //network stuff
+        }
+
         initGame();
         initDisplayButtons();
         initDisplay();
+        setController();
 
 
 
         displayThread.start();
         gameThread.start();
-
-
     }
 
     private void initGame(){
         PlatformLevel platformLevel = new PlatformLevel();
         gameCore = new GameCore(platformLevel);
         gameThread = new GameThread(GAME_LOOP_MAX_TPS,gameCore);
-        InputController inputController = new InputController(gameDisplay,gameCore.getPlayerController());
+    }
+
+    private void readIntent(Intent intent){
+        isSinglePlayer = intent.getBooleanExtra(FLAG_SINGLEPLAYER,true);
     }
 
 
@@ -102,6 +116,11 @@ public class GameActivity extends AppCompatActivity {
         gameDrawer.addDrawable(levelDrawer);
 
         displayThread = new DisplayThread(gameDisplay.getHolder(), gameDrawer);
+    }
+
+    private void setController(){
+        InputController controller = new InputController(gameDisplay, gameCore.getPlayerController());
+        gameDisplay.setOnTouchListener(controller);
     }
 
 
