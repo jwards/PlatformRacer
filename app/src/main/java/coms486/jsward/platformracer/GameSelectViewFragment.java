@@ -48,6 +48,10 @@ public class GameSelectViewFragment extends Fragment {
             Log.e(DEBUG_TAG, "Couldn't find lobby view fragment");
         }
 
+        if(networkManager == null){
+            Log.e(DEBUG_TAG, "Error: Network Manager is null.");
+        }
+
         singlePlayerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

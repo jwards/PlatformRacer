@@ -31,8 +31,8 @@ public class NetworkThread extends Thread {
     private ObjectInputStream objectInputStream;
     private ObjectOutputStream objectOutputStream;
 
-    private RecieveSocket recieveSocket;
-    private SendSocket sendSocket;
+    private GameReceiveThread gameReceiveThread;
+    private GameSendThread gameSendThread;
 
     private boolean connectionAlive;
 
@@ -144,11 +144,11 @@ public class NetworkThread extends Thread {
 
 
     private void beginGame(GameCore gameCore) throws IOException {
-        recieveSocket = new RecieveSocket(SERVER_UPDATE_RATE, objectInputStream, gameCore);
-        sendSocket = new SendSocket(CLIENT_INPUT_POLL_RATE, objectOutputStream, gameCore.getPlayerController());
+        gameReceiveThread = new GameReceiveThread(SERVER_UPDATE_RATE, objectInputStream, gameCore);
+        gameSendThread = new GameSendThread(CLIENT_INPUT_POLL_RATE, objectOutputStream, gameCore.getPlayerController());
         //begin game communication
-        recieveSocket.start();
-        sendSocket.start();
+        gameReceiveThread.start();
+        gameSendThread.start();
     }
 
     private void initNetwork(){

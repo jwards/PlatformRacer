@@ -12,7 +12,7 @@ import jsward.platformracer.common.util.TickerThread;
 import jsward.platformracer.common.game.GameCore;
 import jsward.platformracer.common.network.GameUpdatePacket;
 
-public class RecieveSocket extends TickerThread {
+public class GameReceiveThread extends TickerThread {
 
     private static final String DEBUG_TAG = "RECIEVE_SOCKET";
 
@@ -20,7 +20,7 @@ public class RecieveSocket extends TickerThread {
 
     private GameCore gameCore;
 
-    public RecieveSocket(int maxTPS, ObjectInputStream objectInputStream, GameCore gameCore) throws IOException {
+    public GameReceiveThread(int maxTPS, ObjectInputStream objectInputStream, GameCore gameCore) throws IOException {
         super(maxTPS,true,new AndroidLogger());
         this.gameCore = gameCore;
         input = objectInputStream;

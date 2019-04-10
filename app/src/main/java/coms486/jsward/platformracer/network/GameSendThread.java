@@ -11,7 +11,7 @@ import jsward.platformracer.common.util.TickerThread;
 import jsward.platformracer.common.game.PlayerController;
 import jsward.platformracer.common.network.GameInputPacket;
 
-public class SendSocket extends TickerThread {
+public class GameSendThread extends TickerThread {
 
 
     private static final String DEBUG_TAG ="SEND_SOCKET";
@@ -19,7 +19,7 @@ public class SendSocket extends TickerThread {
     private GameInputPacket gameInputPacket;
     private PlayerController controller;
 
-    public SendSocket(int maxTPS,ObjectOutputStream objectOutputStream ,PlayerController controller) throws IOException {
+    public GameSendThread(int maxTPS, ObjectOutputStream objectOutputStream , PlayerController controller) throws IOException {
         super(maxTPS,true,new AndroidLogger());
         out = objectOutputStream;
         gameInputPacket = new GameInputPacket();

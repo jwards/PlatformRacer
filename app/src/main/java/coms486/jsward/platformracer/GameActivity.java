@@ -7,8 +7,6 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
-import java.io.IOException;
-import java.net.Socket;
 import java.util.ArrayList;
 
 import coms486.jsward.platformracer.display.DrawLevel;
@@ -18,17 +16,11 @@ import coms486.jsward.platformracer.display.DisplayThread;
 import coms486.jsward.platformracer.display.GameDisplay;
 import coms486.jsward.platformracer.display.SVButton;
 import coms486.jsward.platformracer.game.GameThread;
-import coms486.jsward.platformracer.network.NetworkThread;
-import coms486.jsward.platformracer.network.RecieveSocket;
-import coms486.jsward.platformracer.network.SendSocket;
 import jsward.platformracer.common.game.GameCore;
 import jsward.platformracer.common.game.PlatformLevel;
 import jsward.platformracer.common.game.PlayerController;
 
-import static jsward.platformracer.common.util.Constants.CLIENT_INPUT_POLL_RATE;
 import static jsward.platformracer.common.util.Constants.GAME_LOOP_MAX_TPS;
-import static jsward.platformracer.common.util.Constants.SERVER_PORT;
-import static jsward.platformracer.common.util.Constants.SERVER_UPDATE_RATE;
 
 public class GameActivity extends AppCompatActivity {
 
