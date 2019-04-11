@@ -19,12 +19,10 @@
         android:layout_gravity="center_horizontal"
         android:text="Create Game" />
 
-    <fragment
-        android:id="@+id/fragment_lobby_view"
-        android:name="coms486.jsward.platformracer.LobbyViewFragment"
+    <ListView
         android:layout_width="match_parent"
-        android:layout_height="500dp">
-
-    </fragment>
+        android:layout_height="500dp"
+        android:id="@+id/game_lobby_list">
+    </ListView>
 
 </LinearLayout>

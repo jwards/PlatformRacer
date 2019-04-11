@@ -11,6 +11,7 @@ import jsward.platformracer.common.game.GameCore;
 import jsward.platformracer.common.network.CreateGamePacket;
 import jsward.platformracer.common.network.JoinGamePacket;
 import jsward.platformracer.common.network.LobbyPacket;
+import jsward.platformracer.common.network.ReqType;
 import jsward.platformracer.common.network.Status;
 
 import static jsward.platformracer.common.util.Constants.CLIENT_INPUT_POLL_RATE;
@@ -59,13 +60,13 @@ public class NetworkThread extends Thread {
                     Log.d(DEBUG_TAG, "Requesting: " + pendingRequest.toString());
                     switch (pendingRequest.getType()){
                         case REQ_JOIN:
-                            joinReq();
+                            joinReq((SimpleRequest) pendingRequest);
                             break;
                         case REQ_CREATE:
-                            createReq();
+                            createReq((SimpleRequest) pendingRequest);
                             break;
                         case REQ_LOBBY_LIST:
-                            lobbyReq();
+                            lobbyReq((LobbyUpdateRequest) pendingRequest);
                             break;
                         case REQ_DESTROY:
                             break;
@@ -80,6 +81,8 @@ public class NetworkThread extends Thread {
                 Log.d(DEBUG_TAG, Log.getStackTraceString(e));
             } catch (ClassNotFoundException e) {
                 Log.d(DEBUG_TAG, Log.getStackTraceString(e));
+            } finally {
+                pendingRequest = null;
             }
         }
     }
@@ -101,16 +104,16 @@ public class NetworkThread extends Thread {
     }
 
 
-    private void lobbyReq() throws IOException, ClassNotFoundException {
+    private void lobbyReq(LobbyUpdateRequest req) throws IOException, ClassNotFoundException {
         //send request for lobby list
         Log.d(DEBUG_TAG, "Sending lobby update request...");
         objectOutputStream.writeObject(new LobbyPacket(null));
-        Object obj = objectInputStream.readObject();
+        Object obj = objectInputStream.readUnshared();
         if(obj != null){
             if(obj instanceof LobbyPacket){
                 LobbyPacket lp = (LobbyPacket) obj;
                 Log.d(DEBUG_TAG,"Received: "+lp.toString());
-                pendingRequest.getCallback().onLobbyUpdated(lp.getInfos());
+                req.getCallback().onLobbyUpdated(lp.getInfos());
             } else {
                 Log.d(DEBUG_TAG,"Error receiving LobbyUpdatePacket. Wrong class: "+obj.toString());
             }
@@ -119,18 +122,19 @@ public class NetworkThread extends Thread {
         }
     }
 
-    private void joinReq() throws IOException {
+    private void joinReq(SimpleRequest req) throws IOException {
         //send request to join a game
-        JoinGamePacket jgp = new JoinGamePacket(pendingRequest.getJoinSessionId());
+        JoinGamePacket jgp = new JoinGamePacket(req.getExtra());
         Log.d(DEBUG_TAG,"Sending join game request: "+jgp.toString());
         objectOutputStream.writeUnshared(jgp);
 
-        int response = objectInputStream.readInt();
+        Log.d(DEBUG_TAG, "Waiting for repsonse...");
+        int response= objectInputStream.readInt();
         Log.d(DEBUG_TAG, "Received: " + Status.valueOf(response));
-        pendingRequest.getCallback().onResponse(Status.valueOf(response));
+        req.getCallback().onResponse(ReqType.REQ_JOIN, Status.valueOf(response));
     }
 
-    private void createReq() throws IOException {
+    private void createReq(SimpleRequest req) throws IOException {
         //send request to create game
         CreateGamePacket cgp = new CreateGamePacket();
         Log.d(DEBUG_TAG,"Sending create game request...");
@@ -138,7 +142,7 @@ public class NetworkThread extends Thread {
 
         int response = objectInputStream.readInt();
         Log.d(DEBUG_TAG, "Recieved: " + Status.valueOf(response));
-        pendingRequest.getCallback().onResponse(Status.valueOf(response));
+        req.getCallback().onResponse(ReqType.REQ_CREATE,Status.valueOf(response));
 
     }
 

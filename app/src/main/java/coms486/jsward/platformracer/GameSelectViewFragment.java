@@ -11,26 +11,27 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import coms486.jsward.platformracer.R;
 import coms486.jsward.platformracer.network.NetworkManager;
+import coms486.jsward.platformracer.network.RequestStatusCallback;
+import jsward.platformracer.common.network.ReqType;
+import jsward.platformracer.common.network.Status;
 
 
-public class GameSelectViewFragment extends Fragment {
+public class GameSelectViewFragment extends Fragment implements RequestStatusCallback {
 
     private static final String DEBUG_TAG = "GAME_SELECT_FRAGMENT";
 
 
     private Button singlePlayerBtn;
     private Button multiPlayerBtn;
+    private ListView lobbyListView;
 
-
-    private Fragment currentFragment;
-
-    private NetworkManager networkManager;
-
-    private LobbyViewFragment lobbyViewFragment;
+    private LobbyListAdapter lobbyListAdapter;
 
 
     @Nullable
@@ -42,15 +43,9 @@ public class GameSelectViewFragment extends Fragment {
         singlePlayerBtn = view.findViewById(R.id.game_mode_sp_btn);
         multiPlayerBtn = view.findViewById(R.id.game_mode_mp_btn);
 
-        lobbyViewFragment = (LobbyViewFragment) getChildFragmentManager().findFragmentById(R.id.fragment_lobby_view);
-
-        if(lobbyViewFragment == null){
-            Log.e(DEBUG_TAG, "Couldn't find lobby view fragment");
-        }
-
-        if(networkManager == null){
-            Log.e(DEBUG_TAG, "Error: Network Manager is null.");
-        }
+        lobbyListView = view.findViewById(R.id.game_lobby_list);
+        lobbyListAdapter = new LobbyListAdapter(getContext(),this);
+        lobbyListView.setAdapter(lobbyListAdapter);
 
         singlePlayerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -67,8 +62,9 @@ public class GameSelectViewFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 //create game lobby
-                if(networkManager.available()){
-                    networkManager.reqLobbyList(lobbyViewFragment.getListAdapter());
+                NetworkManager netman = NetworkManager.getInstance();
+                if(netman.available()){
+                    netman.reqLobbyList(lobbyListAdapter);
                 } else {
                     Toast.makeText(getContext(), "Network not available", Toast.LENGTH_SHORT).show();
                 }
@@ -78,8 +74,27 @@ public class GameSelectViewFragment extends Fragment {
         return view;
     }
 
-    public void setNetworkManager(NetworkManager networkManager){
-        this.networkManager = networkManager;
+
+    public void joinGame(int id){
+        NetworkManager netman = NetworkManager.getInstance();
+        netman.reqJoinGame(this, id);
     }
 
+
+    @Override
+    public void onResponse(ReqType type, Status response) {
+        switch (type) {
+            case REQ_JOIN:
+                if(response == Status.BEGIN){
+                    //game is begining
+
+                } else if (response == Status.OK){
+                    //joined game but game hasn't begun yet
+
+                } else{
+                    //bad request
+
+                }
+        }
+    }
 }

@@ -27,14 +27,6 @@ public class GameSelectActivity extends FragmentActivity {
         viewFrame = findViewById(R.id.game_select_frame);
 
         gameSelectFragment = (GameSelectViewFragment) getSupportFragmentManager().findFragmentById(R.id.game_select_fragment);
-
-        networkManager = new NetworkManager();
-
-        if(gameSelectFragment == null){
-            Log.d(DEBUG_TAG, "Error: can't find GameSelectFragment");
-        } else {
-            gameSelectFragment.setNetworkManager(networkManager);
-        }
     }
 
 

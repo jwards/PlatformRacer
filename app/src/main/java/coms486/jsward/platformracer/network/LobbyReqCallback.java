@@ -5,9 +5,6 @@ import java.util.ArrayList;
 import jsward.platformracer.common.network.GameSessionInfo;
 import jsward.platformracer.common.network.Status;
 
-public interface NetworkResponseCallback {
-
+public interface LobbyReqCallback extends NCallback{
     void onLobbyUpdated(ArrayList<GameSessionInfo> lobby);
-    void onResponse(Status status);
-
 }
