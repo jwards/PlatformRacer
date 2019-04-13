@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import coms486.jsward.platformracer.R;
 import coms486.jsward.platformracer.network.NetworkManager;
+import coms486.jsward.platformracer.network.NetworkThread;
 import coms486.jsward.platformracer.network.RequestStatusCallback;
 import jsward.platformracer.common.network.ReqType;
 import jsward.platformracer.common.network.Status;
@@ -47,6 +48,7 @@ public class GameSelectViewFragment extends Fragment implements RequestStatusCal
         lobbyListAdapter = new LobbyListAdapter(getContext(),this);
         lobbyListView.setAdapter(lobbyListAdapter);
 
+
         singlePlayerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -64,12 +66,16 @@ public class GameSelectViewFragment extends Fragment implements RequestStatusCal
                 //create game lobby
                 NetworkManager netman = NetworkManager.getInstance();
                 if(netman.available()){
-                    netman.reqLobbyList(lobbyListAdapter);
+                    netman.reqCreateGame(null);
                 } else {
                     Toast.makeText(getContext(), "Network not available", Toast.LENGTH_SHORT).show();
                 }
             }
         });
+
+        NetworkManager netman = NetworkManager.getInstance();
+        //poll server every 3 seconds for lobby update
+        netman.reqLobbyListRecurring(lobbyListAdapter,3000);
 
         return view;
     }

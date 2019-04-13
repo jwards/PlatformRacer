@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.PriorityQueue;
 
 import jsward.platformracer.common.game.GameCore;
 import jsward.platformracer.common.network.CreateGamePacket;
@@ -23,9 +24,9 @@ public class NetworkThread extends Thread {
     private static final String DEBUG_TAG = "NETWORK_THREAD";
 
     //desktop
-    //private static final String SERVER_ADDR  = "desktop-93rq231.student.iastate.edu";
+    private static final String SERVER_ADDR  = "desktop-93rq231.student.iastate.edu";
     //laptop
-    private static final String SERVER_ADDR  = "desktop-rqgu2tp.student.iastate.edu";
+    //private static final String SERVER_ADDR  = "desktop-rqgu2tp.student.iastate.edu";
 
     private NetworkManager callback;
     private Socket socket;
@@ -37,42 +38,65 @@ public class NetworkThread extends Thread {
 
     private boolean connectionAlive;
 
-    private NetRequest pendingRequest;
+    private PriorityQueue<NetRequest> requestQueue;
 
     public NetworkThread(NetworkManager callback) {
         super();
         this.callback = callback;
+        requestQueue = new PriorityQueue<>();
         connectionAlive = false;
-        pendingRequest = null;
     }
 
     @Override
     public synchronized void run() {
         Log.d(DEBUG_TAG,"Network thread runnning...");
         initNetwork();
-        //lobby communication
 
+        long nextWait = 0;
+
+        //lobby communication
         while(connectionAlive){
             try {
-                Log.d(DEBUG_TAG, "Waiting for request...");
-                wait();
-                if(pendingRequest != null){
-                    Log.d(DEBUG_TAG, "Requesting: " + pendingRequest.toString());
-                    switch (pendingRequest.getType()){
-                        case REQ_JOIN:
-                            joinReq((SimpleRequest) pendingRequest);
-                            break;
-                        case REQ_CREATE:
-                            createReq((SimpleRequest) pendingRequest);
-                            break;
-                        case REQ_LOBBY_LIST:
-                            lobbyReq((LobbyUpdateRequest) pendingRequest);
-                            break;
-                        case REQ_DESTROY:
-                            break;
-                    }
+                Log.d(DEBUG_TAG, "Waiting for "+nextWait+" ms. Or until new request...");
 
-                    pendingRequest = null;
+                wait(nextWait);
+
+                NetRequest request;
+                synchronized (requestQueue) {
+                    if (requestQueue.peek() != null) {
+                        if (requestQueue.peek().isReady()) {
+                            request = requestQueue.poll();
+                            Log.d(DEBUG_TAG, "Executing request: " + request.toString());
+                            request.onExecute();
+                            if (!request.isExpired()) {
+                                requestQueue.add(request);
+                            }
+                            if (requestQueue.peek() != null) {
+                                nextWait = requestQueue.peek().getWaitTime();
+                            }
+
+                            switch (request.getType()) {
+                                case REQ_JOIN:
+                                    joinReq((SimpleRequest) request);
+                                    break;
+                                case REQ_CREATE:
+                                    createReq((SimpleRequest) request);
+                                    break;
+                                case REQ_LOBBY_LIST:
+                                    lobbyReq((LobbyUpdateRequest) request);
+                                    break;
+                                case REQ_DESTROY:
+                                    break;
+                            }
+                        } else{
+                            nextWait = requestQueue.peek().getWaitTime();
+                        }
+                    } else {
+                        //there is nothing in the queue so there is nothing to do, we wait forever.
+                        //when a request is added to the queue, notify will be called which will then set nextWait to the
+                        //appropriate time if the request is recurring.
+                        nextWait = 0;
+                    }
                 }
 
             } catch (InterruptedException e) {
@@ -81,8 +105,6 @@ public class NetworkThread extends Thread {
                 Log.d(DEBUG_TAG, Log.getStackTraceString(e));
             } catch (ClassNotFoundException e) {
                 Log.d(DEBUG_TAG, Log.getStackTraceString(e));
-            } finally {
-                pendingRequest = null;
             }
         }
     }
@@ -90,14 +112,22 @@ public class NetworkThread extends Thread {
     //called from seperate thread
     //returns true if request can be made
     public synchronized boolean request(NetRequest req){
-        if(pendingRequest == null && connectionAlive){
-            pendingRequest = req;
+        if(connectionAlive){
+            requestQueue.add(req);
+            Log.d(DEBUG_TAG, "Request added to queue " + req.toString());
+            Log.d(DEBUG_TAG, requestQueue.toString());
             notify();
             return true;
         } else {
             return false;
         }
     }
+
+    public synchronized boolean cancleRequest(NetRequest req){
+        //TODO
+        return false;
+    }
+
 
     public boolean isConnected(){
         return connectionAlive;

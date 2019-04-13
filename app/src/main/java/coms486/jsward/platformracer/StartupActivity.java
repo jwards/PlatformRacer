@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import coms486.jsward.platformracer.network.NetworkManager;
+
 public class StartupActivity extends AppCompatActivity {
 
     @Override
@@ -27,6 +29,8 @@ public class StartupActivity extends AppCompatActivity {
         leaderButton.setOnClickListener(buttonListener);
         testButton.setOnClickListener(buttonListener);
 
+        //connect to network
+        NetworkManager networkManager = NetworkManager.getInstance();
     }
 
     private void launch(Class activity){

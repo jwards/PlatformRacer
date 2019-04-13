@@ -24,8 +24,14 @@ public class NetworkManager {
         return networkThread.request(request);
     }
 
+    public boolean reqLobbyListRecurring(LobbyReqCallback callback,long millis){
+        LobbyUpdateRequest request = new LobbyUpdateRequest(ReqType.REQ_LOBBY_LIST, callback, millis, -1);
+        return networkThread.request(request);
+    }
+
     public boolean reqJoinGame(RequestStatusCallback callback, int gameSessionId){
-        SimpleRequest request = new SimpleRequest(ReqType.REQ_JOIN, callback).setExtra(gameSessionId);
+        SimpleRequest request = new SimpleRequest(ReqType.REQ_JOIN, callback);
+        request.addExtra(gameSessionId);
         return networkThread.request(request);
     }
 

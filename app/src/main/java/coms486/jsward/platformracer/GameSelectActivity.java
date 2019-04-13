@@ -25,7 +25,6 @@ public class GameSelectActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_select);
         viewFrame = findViewById(R.id.game_select_frame);
-
         gameSelectFragment = (GameSelectViewFragment) getSupportFragmentManager().findFragmentById(R.id.game_select_fragment);
     }
 

@@ -1,43 +1,41 @@
 package coms486.jsward.platformracer.network;
 
+import android.support.annotation.NonNull;
+
 import jsward.platformracer.common.network.ReqType;
 
-public class SimpleRequest implements NetRequest {
+public class SimpleRequest extends NetRequest {
 
-    private ReqType type;
     private RequestStatusCallback callback;
-
     private int extra;
 
     public SimpleRequest(ReqType type,RequestStatusCallback callback){
-        this.type = type;
+        this(type,callback,0,0);
+
+    }
+
+    public SimpleRequest(ReqType type,RequestStatusCallback callback,long interval,int count){
+        super(type, interval, count);
         this.callback = callback;
     }
 
-    public NetRequest addExtra(int extra){
+
+
+    public void addExtra(int extra){
         this.extra = extra;
-        return this;
-    }
-
-    public ReqType getType(){
-        return type;
-    }
-
-    public RequestStatusCallback getCallback(){
-        return callback;
     }
 
     public int getExtra(){
         return extra;
     }
 
-    public SimpleRequest setExtra(int extra){
-        this.extra = extra;
-        return this;
+    @Override
+    public RequestStatusCallback getCallback() {
+        return callback;
     }
 
-    public String toString(){
-        return "[Type: "+type + ", Callback: "+callback.toString() +"]";
+    @Override
+    public String toString() {
+        return "["+type+", "+callback.toString()+", "+super.getInterval()+"]";
     }
-
 }
