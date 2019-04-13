@@ -70,9 +70,11 @@ public class NetworkThread extends Thread {
                             request.onExecute();
                             if (!request.isExpired()) {
                                 requestQueue.add(request);
+                                Log.d(DEBUG_TAG, "Adding event: " + request.toString() + " back into queue");
                             }
                             if (requestQueue.peek() != null) {
                                 nextWait = requestQueue.peek().getWaitTime();
+                                Log.d(DEBUG_TAG, "Next event: "+requestQueue.peek().toString()+" in ... " + nextWait);
                             }
 
                             switch (request.getType()) {
@@ -90,6 +92,7 @@ public class NetworkThread extends Thread {
                             }
                         } else{
                             nextWait = requestQueue.peek().getWaitTime();
+                            Log.d(DEBUG_TAG, "Next event: "+requestQueue.peek().toString()+" in ... " + nextWait);
                         }
                     } else {
                         //there is nothing in the queue so there is nothing to do, we wait forever.

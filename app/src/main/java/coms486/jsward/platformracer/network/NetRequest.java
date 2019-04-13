@@ -33,12 +33,15 @@ public abstract class NetRequest implements Comparable<NetRequest> {
     }
 
     public boolean isExpired() {
-        return count != -1 && runCounter > count;
+        if(count == -1) {
+            return false;
+        }
+       return runCounter > count;
     }
 
     public void onExecute() {
         lastRun = System.currentTimeMillis();
-        if(count>0)
+        if(count != -1)
             runCounter++;
     }
 
@@ -57,7 +60,12 @@ public abstract class NetRequest implements Comparable<NetRequest> {
         if(interval == 0){
             return 0;
         }
-        return interval - (System.currentTimeMillis() - lastRun);
+        long currentTime = System.currentTimeMillis();
+        if(lastRun+interval <= currentTime){
+            return 10;
+        } else {
+            return interval - (currentTime - lastRun);
+        }
     }
 
 

@@ -61,7 +61,7 @@ public class LobbyListAdapter extends BaseAdapter implements LobbyReqCallback {
         if(gameSessionInfo == null){
 
         } else {
-            name.setText(gameSessionInfo.hostPlayerName + " : "+gameSessionInfo.capacity+"/"+gameSessionInfo.maxCapacity);
+            name.setText(gameSessionInfo.lobbyId +" : "+gameSessionInfo.hostPlayerName + " : "+gameSessionInfo.capacity+"/"+gameSessionInfo.maxCapacity);
         }
         view.setTag(position);
         return view;
