@@ -1,6 +1,7 @@
 package jsward.platformracer.common.network;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class GameSessionInfo implements Serializable {
 
@@ -8,17 +9,20 @@ public class GameSessionInfo implements Serializable {
     public final int capacity;
     public final int maxCapacity;
 
-    public final String hostPlayerName;
+    public final int hostPlayerId;
 
-    public GameSessionInfo(int lobbyId,String hostPlayerName,int capacity,int maxCapacity){
+    public ArrayList<String> players;
+
+    public GameSessionInfo(int lobbyId,int hostPlayerId,int capacity,int maxCapacity,ArrayList<String> players){
         this.lobbyId = lobbyId;
         this.capacity = capacity;
         this.maxCapacity = maxCapacity;
-        this.hostPlayerName = hostPlayerName;
+        this.hostPlayerId = hostPlayerId;
+        this.players = players;
     }
 
     @Override
     public String toString() {
-        return "[ID: "+lobbyId+ ", Capacity: "+capacity+"/"+maxCapacity+", Host: "+hostPlayerName+"]";
+        return "[ID: "+lobbyId+ ", Capacity: "+capacity+"/"+maxCapacity+", HostId: "+hostPlayerId+ ", Players: "+players.toString()+"]";
     }
 }

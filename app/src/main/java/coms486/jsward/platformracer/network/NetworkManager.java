@@ -19,14 +19,20 @@ public class NetworkManager {
         return INSTANCE;
     }
 
-    public boolean reqLobbyList(LobbyReqCallback callback){
-        LobbyUpdateRequest request = new LobbyUpdateRequest(ReqType.REQ_LOBBY_LIST,callback);
+    public boolean reqLobbyList(LobbyReqCallback callback,int lobbyId){
+        LobbyUpdateRequest request = new LobbyUpdateRequest(ReqType.REQ_LOBBY_LIST,lobbyId,callback);
         return networkThread.request(request);
     }
 
-    public boolean reqLobbyListRecurring(LobbyReqCallback callback,long millis){
-        LobbyUpdateRequest request = new LobbyUpdateRequest(ReqType.REQ_LOBBY_LIST, callback, millis, -1);
-        return networkThread.request(request);
+    //LobbyId = -1 to get all lobbies
+    //else attempt to get specific lobby
+    public String reqLobbyListRecurring(LobbyReqCallback callback,int lobbyId,long millis){
+        LobbyUpdateRequest request = new LobbyUpdateRequest(ReqType.REQ_LOBBY_LIST,lobbyId, callback, millis, -1);
+        if(networkThread.request(request)){
+            return request.getRequestId();
+        } else {
+            return "";
+        }
     }
 
     public boolean reqJoinGame(RequestStatusCallback callback, int gameSessionId){
@@ -38,6 +44,10 @@ public class NetworkManager {
     public boolean reqCreateGame(RequestStatusCallback callback){
         SimpleRequest request = new SimpleRequest(ReqType.REQ_CREATE,callback);
         return networkThread.request(request);
+    }
+
+    public void cancleRequest(String requestId){
+        networkThread.cancleRequest(requestId);
     }
 
     public boolean available(){

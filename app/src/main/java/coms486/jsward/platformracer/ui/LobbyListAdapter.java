@@ -1,4 +1,4 @@
-package coms486.jsward.platformracer;
+package coms486.jsward.platformracer.ui;
 
 import android.content.Context;
 import android.os.Handler;
@@ -10,24 +10,23 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import coms486.jsward.platformracer.R;
 import coms486.jsward.platformracer.network.LobbyReqCallback;
 import jsward.platformracer.common.network.GameSessionInfo;
-import jsward.platformracer.common.network.Status;
 
-public class LobbyListAdapter extends BaseAdapter implements LobbyReqCallback {
+public class LobbyListAdapter extends BaseAdapter {
 
     private Context context;
-    private GameSelectViewFragment actionCallback;
+    private GameSelectController actionCallback;
     private ArrayList<GameSessionInfo> lobby;
 
     private LobbyClickListener clickListener;
 
-    public LobbyListAdapter(Context context,GameSelectViewFragment actionCallback){
+
+    public LobbyListAdapter(Context context){
         this.context = context;
-        this.actionCallback = actionCallback;
         clickListener = new LobbyClickListener();
         lobby = new ArrayList<>();
-        lobby.add(new GameSessionInfo(-1, "TEST", 0, 0));
     }
 
 
@@ -58,17 +57,17 @@ public class LobbyListAdapter extends BaseAdapter implements LobbyReqCallback {
 
         GameSessionInfo gameSessionInfo = (GameSessionInfo) getItem(position);
         TextView name = view.findViewById(R.id.lobby_entry_text);
-        if(gameSessionInfo == null){
 
+        if(gameSessionInfo == null){
+            name.setText("Empty");
         } else {
-            name.setText(gameSessionInfo.lobbyId +" : "+gameSessionInfo.hostPlayerName + " : "+gameSessionInfo.capacity+"/"+gameSessionInfo.maxCapacity);
+            name.setText(gameSessionInfo.lobbyId +" : "+gameSessionInfo.hostPlayerId + " : "+gameSessionInfo.capacity+"/"+gameSessionInfo.maxCapacity);
         }
         view.setTag(position);
         return view;
     }
 
-    @Override
-    public void onLobbyUpdated(ArrayList<GameSessionInfo> lobby) {
+    public void changeData(ArrayList<GameSessionInfo> lobby) {
         this.lobby = lobby;
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
@@ -78,11 +77,11 @@ public class LobbyListAdapter extends BaseAdapter implements LobbyReqCallback {
         });
     }
 
+    public void setGameSelectController(GameSelectController gameSelectController){
+        this.actionCallback = gameSelectController;
+    }
+
     private class LobbyClickListener implements View.OnClickListener {
-
-        public LobbyClickListener(){
-
-        }
 
         @Override
         public void onClick(View v) {
@@ -91,7 +90,7 @@ public class LobbyListAdapter extends BaseAdapter implements LobbyReqCallback {
             GameSessionInfo info = (GameSessionInfo) getItem(tag);
             if(info != null){
                 //attempt to join game
-                actionCallback.joinGame(info.lobbyId);
+                actionCallback.onJoinGameClick(info.lobbyId);
             }
         }
     }

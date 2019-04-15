@@ -2,12 +2,15 @@ package coms486.jsward.platformracer.network;
 
 import android.support.annotation.NonNull;
 
+import java.util.UUID;
+
 import jsward.platformracer.common.network.ReqType;
 
 public abstract class NetRequest implements Comparable<NetRequest> {
 
     protected ReqType type;
 
+    private final String REQUEST_ID = UUID.randomUUID().toString();
     private final long interval;
     private final int count;
     protected int runCounter;
@@ -68,6 +71,10 @@ public abstract class NetRequest implements Comparable<NetRequest> {
         }
     }
 
+    public String getRequestId(){
+        return REQUEST_ID;
+    }
+
 
     @Override
     public int compareTo(@NonNull NetRequest o) {
@@ -78,5 +85,16 @@ public abstract class NetRequest implements Comparable<NetRequest> {
         } else {
             return 0;
         }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj != null){
+            if(obj instanceof NetRequest){
+                NetRequest other = (NetRequest) obj;
+                return this.getRequestId().equals(other.getRequestId());
+            }
+        }
+        return false;
     }
 }
