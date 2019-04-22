@@ -17,8 +17,7 @@ public class GameSelectActivity extends FragmentActivity {
     private FrameLayout viewFrame;
 
     private GameSelectViewFragment gameSelectFragment;
-
-    private NetworkManager networkManager;
+    private GameSelectController gameSelectController;
 
 
     @Override
@@ -27,9 +26,19 @@ public class GameSelectActivity extends FragmentActivity {
         setContentView(R.layout.activity_game_select);
         viewFrame = findViewById(R.id.game_select_frame);
         gameSelectFragment = (GameSelectViewFragment) getSupportFragmentManager().findFragmentById(R.id.game_select_fragment);
-        GameSelectController gameSelectController = new GameSelectController(this,gameSelectFragment);
+        gameSelectController = new GameSelectController(this,gameSelectFragment);
         gameSelectFragment.setController(gameSelectController);
     }
 
-
+    @Override
+    public void onBackPressed() {
+        if(gameSelectController !=null){
+            if(gameSelectController.onBackPressed()){
+                //controller handled back press
+                return;
+            }
+        }
+        //controller didn't handle the back press
+        super.onBackPressed();
+    }
 }

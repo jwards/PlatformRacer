@@ -104,4 +104,16 @@ public class GameSelectController implements RequestStatusCallback, LobbyReqCall
                 break;
         }
     }
+
+    //returns true if the back pressed was handled
+    public boolean onBackPressed(){
+
+        if(showLobby){
+            //exit lobby
+
+
+        }
+
+        return false;
+    }
 }
