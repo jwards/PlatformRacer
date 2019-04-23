@@ -20,4 +20,13 @@ public class LobbyPacket implements Serializable {
     public int getLobbyId(){
         return lobbyId;
     }
+
+    @Override
+    public String toString() {
+        if(gameSessions !=null) {
+            return "LobbyUpdate-[ID: " + lobbyId + ", " + gameSessions.toString() + "]";
+        } else {
+            return "LobbyUpdate-[ID: " + lobbyId + ", " + "EMPTY" + "]";
+        }
+    }
 }

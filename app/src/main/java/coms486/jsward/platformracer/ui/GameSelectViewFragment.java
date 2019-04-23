@@ -90,6 +90,7 @@ public class GameSelectViewFragment extends Fragment {
     public void setController(GameSelectController controller){
         this.controller = controller;
         lobbyListAdapter.setGameSelectController(controller);
+        gameSessionListAdapter.setGameSelectController(controller);
     }
 
     private void setListViewAdapter(final ListAdapter adapter){

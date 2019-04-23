@@ -8,7 +8,8 @@ public enum ReqType {
     REQ_LOBBY_LIST,
     REQ_JOIN,
     REQ_CREATE,
-    REQ_DESTROY;
+    REQ_DESTROY,
+    REQ_START;
 
 
     private static Map<Integer, ReqType> map = new HashMap<>();

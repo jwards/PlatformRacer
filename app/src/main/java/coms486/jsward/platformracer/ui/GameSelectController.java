@@ -100,20 +100,43 @@ public class GameSelectController implements RequestStatusCallback, LobbyReqCall
 
                 break;
             case REQ_DESTROY:
+                if(response == Status.OK){
+                    //we left the game
+                    showLobby = true;
+                    //cancle the requests for the lobby we were in
+                    netman.cancleRequest(lobbyUpdateRequestId);
+                    //new request for getting list of lobbies
+                    lobbyUpdateRequestId = netman.reqLobbyListRecurring(this, -1, 3000);
+                }
+                break;
+            case REQ_START:
+                //enter the game activity
 
                 break;
+        }
+    }
+
+    public void onRequestStartGame(){
+        //send request to server to start the current game
+        //first check if the request should be made (i.e. are we actually in a lobby)
+        if(!showLobby){
+            netman.reqStartGame(this);
         }
     }
 
     //returns true if the back pressed was handled
     public boolean onBackPressed(){
 
-        if(showLobby){
-            //exit lobby
 
-
+        if(!showLobby){
+            //if we are not in the lobby select menu exit lobby
+            //tell server we left the game lobby
+            netman.reqLeaveGame(this);
+            return true;
+        } else {
+            //exit lobby menu
+            netman.cancleAll();
+            return false;
         }
-
-        return false;
     }
 }

@@ -41,13 +41,28 @@ public class NetworkManager {
         return networkThread.request(request);
     }
 
+    public boolean reqLeaveGame(RequestStatusCallback callback){
+        SimpleRequest request = new SimpleRequest(ReqType.REQ_DESTROY, callback);
+        request.addExtra(-1);
+        return networkThread.request(request);
+    }
+
     public boolean reqCreateGame(RequestStatusCallback callback){
         SimpleRequest request = new SimpleRequest(ReqType.REQ_CREATE,callback);
         return networkThread.request(request);
     }
 
+    public boolean reqStartGame(RequestStatusCallback callback){
+        SimpleRequest request = new SimpleRequest(ReqType.REQ_START,callback);
+        return networkThread.request(request);
+    }
+
     public void cancleRequest(String requestId){
         networkThread.cancleRequest(requestId);
+    }
+
+    public void cancleAll(){
+        networkThread.cancleAll();
     }
 
     public boolean available(){

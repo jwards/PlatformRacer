@@ -24,9 +24,9 @@ public class NetworkThread extends Thread {
     private static final String DEBUG_TAG = "NETWORK_THREAD";
 
     //desktop
-    private static final String SERVER_ADDR  = "desktop-93rq231.student.iastate.edu";
+    //private static final String SERVER_ADDR  = "desktop-93rq231.student.iastate.edu";
     //laptop
-    //private static final String SERVER_ADDR  = "desktop-rqgu2tp.student.iastate.edu";
+    private static final String SERVER_ADDR  = "desktop-rqgu2tp.student.iastate.edu";
 
     private NetworkManager callback;
     private Socket socket;
@@ -88,6 +88,7 @@ public class NetworkThread extends Thread {
                                     lobbyReq((LobbyUpdateRequest) request);
                                     break;
                                 case REQ_DESTROY:
+                                    leaveReq((SimpleRequest) request);
                                     break;
                             }
                         } else{
@@ -136,6 +137,10 @@ public class NetworkThread extends Thread {
         return false;
     }
 
+    public synchronized void cancleAll(){
+        requestQueue.clear();
+    }
+
 
     public boolean isConnected(){
         return connectionAlive;
@@ -182,6 +187,19 @@ public class NetworkThread extends Thread {
         req.getCallback().onResponse(ReqType.REQ_JOIN, response.status,response.gameSessionId);
     }
 
+    private void leaveReq(SimpleRequest req) throws IOException, ClassNotFoundException {
+        //send join packet with id -1
+        JoinGamePacket jgp = new JoinGamePacket(req.getExtra());
+        Log.d(DEBUG_TAG,"Sending leave game request: "+jgp.toString());
+        objectOutputStream.writeUnshared(jgp);
+
+        Log.d(DEBUG_TAG, "Waiting for response...");
+        JoinGamePacket response = (JoinGamePacket) objectInputStream.readUnshared();
+        Log.d(DEBUG_TAG, "Recieved: " + response.status);
+        req.getCallback().onResponse(ReqType.REQ_DESTROY,response.status,response.gameSessionId);
+
+    }
+
     private void createReq(SimpleRequest req) throws IOException, ClassNotFoundException {
         //send request to create game
         CreateGamePacket cgp = new CreateGamePacket();
@@ -206,9 +224,9 @@ public class NetworkThread extends Thread {
     private void initNetwork(){
         try{
             Log.d(DEBUG_TAG, "Attempting to connect to " + SERVER_ADDR + ":" + SERVER_PORT);
-            Socket sock = new Socket(SERVER_ADDR, SERVER_PORT);
-            objectOutputStream = new ObjectOutputStream(sock.getOutputStream());
-            objectInputStream = new ObjectInputStream(sock.getInputStream());
+            socket = new Socket(SERVER_ADDR, SERVER_PORT);
+            objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+            objectInputStream = new ObjectInputStream(socket.getInputStream());
             objectOutputStream.flush();
             Log.d(DEBUG_TAG,"Connection successful");
             connectionAlive = true;
@@ -219,9 +237,18 @@ public class NetworkThread extends Thread {
     }
 
     private void closeNetwork(){
+        //close the socket and its streams
         try {
             if(objectOutputStream != null) objectOutputStream.close();
+        }catch (IOException e){
+            Log.d(DEBUG_TAG, Log.getStackTraceString(e));
+        }
+        try {
             if(objectInputStream != null) objectInputStream.close();
+        }catch (IOException e){
+            Log.d(DEBUG_TAG, Log.getStackTraceString(e));
+        }
+        try {
             if(socket != null) socket.close();
         }catch (IOException e){
             Log.d(DEBUG_TAG, Log.getStackTraceString(e));

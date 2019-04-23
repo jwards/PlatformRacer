@@ -21,7 +21,7 @@ public abstract class NetRequest implements Comparable<NetRequest> {
         this.interval = interval;
         this.count = count;
         runCounter = 0;
-        lastRun = System.currentTimeMillis();
+        lastRun = System.currentTimeMillis() - interval;
     }
 
     public abstract NCallback getCallback();

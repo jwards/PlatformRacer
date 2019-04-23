@@ -1,6 +1,7 @@
 package coms486.jsward.platformracer.ui;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Handler;
 import android.os.Looper;
@@ -19,17 +20,33 @@ class GameSessionListAdapter extends BaseAdapter {
 
     private Context context;
 
+    private GameSelectController actionCallback;
     private GameSessionInfo sessionInfo;
+
+    private static final int TITLE_CARD_TAG = -1;
+    private static final int HOST_CARD_TAG = -2;
 
 
     public GameSessionListAdapter(Context context){
         this.context = context;
     }
 
+    public void setGameSelectController(GameSelectController gameSelectController){
+        this.actionCallback = gameSelectController;
+    }
+
     @Override
     public int getCount() {
         if(sessionInfo!=null) {
-            return sessionInfo.players.size();
+            int count = sessionInfo.players.size();
+            //for title card
+            count += 1;
+            //if host add one for the host card
+            //TODO use real player ID
+            if(sessionInfo.isHost(sessionInfo.hostPlayerId)) {
+                count+=1;
+            }
+            return count;
         } else {
             return 0;
         }
@@ -43,6 +60,8 @@ class GameSessionListAdapter extends BaseAdapter {
             return null;
         }
     }
+
+
 
     @Override
     public long getItemId(int position) {
@@ -58,21 +77,19 @@ class GameSessionListAdapter extends BaseAdapter {
             view = convertView;
         }
 
-        String playerName = (String) getItem(position);
-        TextView name = view.findViewById(R.id.lobby_entry_text);
+        TextView tv = view.findViewById(R.id.lobby_entry_text);
 
-        if(playerName == null){
-            name.setText("Empty");
-        } else {
-            if(position == sessionInfo.hostPlayerId){
-                name.setTextColor(Color.RED);
-            } else {
-                name.setTextColor(Color.DKGRAY);
-            }
-            name.setText(playerName+" : "+sessionInfo.capacity+"/"+sessionInfo.maxCapacity);
+        if(position == 0){
+            return lobbyTitleCard(tv);
         }
-        view.setTag(position);
-        return view;
+
+        if(position == 1){
+            return hostCard(tv);
+        }
+
+
+        //otherwise just display a player
+        return lobbyPlayerEntry(tv, position - 2);
     }
 
 
@@ -84,6 +101,57 @@ class GameSessionListAdapter extends BaseAdapter {
                 notifyDataSetChanged();
             }
         });
+    }
+
+    private View lobbyTitleCard(View view){
+        TextView tv = (TextView) view;
+        tv.setTextColor(Color.BLUE);
+        tv.setText("Capacity: " + sessionInfo.capacity + " / " + sessionInfo.maxCapacity);
+
+        tv.setTag(TITLE_CARD_TAG);
+        return tv;
+    }
+
+    private View lobbyPlayerEntry(View view,int playerPosition){
+        String playerName = (String) getItem(playerPosition);
+        TextView name = (TextView) view;
+
+        if(playerName == null){
+            name.setText("Empty");
+        } else {
+            if(playerPosition== sessionInfo.hostPlayerId){
+                name.setTextColor(Color.RED);
+            } else {
+                name.setTextColor(Color.DKGRAY);
+            }
+            name.setText(playerName);
+        }
+        view.setTag(playerPosition);
+        return view;
+    }
+
+    private View hostCard(View view){
+        TextView tv = (TextView) view;
+        if(sessionInfo.ready()) {
+            tv.setTextColor(Color.GREEN);
+        } else {
+            tv.setTextColor(Color.RED);
+        }
+        tv.setText("START GAME");
+        tv.setTag(HOST_CARD_TAG);
+        return tv;
+    }
+
+    private class ClickLisener implements View.OnClickListener{
+
+        @Override
+        public void onClick(View v) {
+            int tag = (int) v.getTag();
+            if (tag == HOST_CARD_TAG) {
+                //TODO start game
+                actionCallback.onRequestStartGame();
+            }
+        }
     }
 
 }

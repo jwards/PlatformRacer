@@ -21,6 +21,17 @@ public class GameSessionInfo implements Serializable {
         this.players = players;
     }
 
+    public boolean ready(){
+        if(players != null){
+            return players.size() == maxCapacity;
+        }
+        return false;
+    }
+
+    public boolean isHost(int playerId){
+        return playerId == hostPlayerId;
+    }
+
     @Override
     public String toString() {
         return "[ID: "+lobbyId+ ", Capacity: "+capacity+"/"+maxCapacity+", HostId: "+hostPlayerId+ ", Players: "+players.toString()+"]";

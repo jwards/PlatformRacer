@@ -36,6 +36,10 @@ public class SimpleRequest extends NetRequest {
 
     @Override
     public String toString() {
-        return "["+type+", "+callback.toString()+", "+super.getInterval()+"]";
+        if(callback != null) {
+            return "[" + type + ", " + callback.toString() + ", " + super.getInterval() + "]";
+        } else {
+            return "[" + type + ", " + "NULL" + ", " + super.getInterval() + "]";
+        }
     }
 }
