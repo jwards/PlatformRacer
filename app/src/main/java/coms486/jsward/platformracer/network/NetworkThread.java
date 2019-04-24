@@ -5,6 +5,7 @@ import android.util.Log;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.PriorityQueue;
 
@@ -24,9 +25,9 @@ public class NetworkThread extends Thread {
     private static final String DEBUG_TAG = "NETWORK_THREAD";
 
     //desktop
-    //private static final String SERVER_ADDR  = "desktop-93rq231.student.iastate.edu";
+    private static final String SERVER_ADDR  = "desktop-93rq231.student.iastate.edu";
     //laptop
-    private static final String SERVER_ADDR  = "desktop-rqgu2tp.student.iastate.edu";
+    //private static final String SERVER_ADDR  = "desktop-rqgu2tp.student.iastate.edu";
 
     private NetworkManager callback;
     private Socket socket;
@@ -102,11 +103,13 @@ public class NetworkThread extends Thread {
                         nextWait = 0;
                     }
                 }
-
             } catch (InterruptedException e) {
                 Log.d(DEBUG_TAG, Log.getStackTraceString(e));
             } catch (IOException e) {
                 Log.d(DEBUG_TAG, Log.getStackTraceString(e));
+                //try to reconnect
+                closeNetwork();
+                initNetwork();
             } catch (ClassNotFoundException e) {
                 Log.d(DEBUG_TAG, Log.getStackTraceString(e));
             }
@@ -224,12 +227,17 @@ public class NetworkThread extends Thread {
     private void initNetwork(){
         try{
             Log.d(DEBUG_TAG, "Attempting to connect to " + SERVER_ADDR + ":" + SERVER_PORT);
-            socket = new Socket(SERVER_ADDR, SERVER_PORT);
-            objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-            objectInputStream = new ObjectInputStream(socket.getInputStream());
-            objectOutputStream.flush();
-            Log.d(DEBUG_TAG,"Connection successful");
-            connectionAlive = true;
+            socket = new Socket();
+            socket.connect(new InetSocketAddress(SERVER_ADDR,SERVER_PORT),1000);
+            if(socket.isConnected()) {
+                objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+                objectInputStream = new ObjectInputStream(socket.getInputStream());
+                objectOutputStream.flush();
+                Log.d(DEBUG_TAG, "Connection successful");
+                connectionAlive = true;
+            } else {
+
+            }
         } catch (IOException e){
             Log.d(DEBUG_TAG, "Error connecting to " + SERVER_ADDR + ":" + SERVER_PORT);
             Log.d(DEBUG_TAG, Log.getStackTraceString(e));
@@ -238,6 +246,7 @@ public class NetworkThread extends Thread {
 
     private void closeNetwork(){
         //close the socket and its streams
+        connectionAlive = false;
         try {
             if(objectOutputStream != null) objectOutputStream.close();
         }catch (IOException e){

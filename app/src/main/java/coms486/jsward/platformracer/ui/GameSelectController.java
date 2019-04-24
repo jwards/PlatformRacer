@@ -1,7 +1,6 @@
 package coms486.jsward.platformracer.ui;
 
 import android.content.Intent;
-import android.os.Bundle;
 
 import java.util.ArrayList;
 
@@ -24,14 +23,16 @@ public class GameSelectController implements RequestStatusCallback, LobbyReqCall
 
     private String lobbyUpdateRequestId;
 
-    private boolean showLobby;
+    //true when we are viewing lobbies to join
+    //false when we are in a game lobby
+    private boolean isLobbySelecting;
 
     public GameSelectController(GameSelectActivity gameSelectActivity, GameSelectViewFragment gameSelectView){
         this.gameSelectActivity = gameSelectActivity;
         this.gameSelectView = gameSelectView;
         //poll server every 3 seconds for lobby update
         lobbyUpdateRequestId = netman.reqLobbyListRecurring(this,-1,3000);
-        showLobby = true;
+        isLobbySelecting = true;
     }
 
 
@@ -39,14 +40,18 @@ public class GameSelectController implements RequestStatusCallback, LobbyReqCall
 
 
     public void onSinglePlayerClick(){
-        Intent intent = new Intent(gameSelectActivity, GameActivity.class);
-        intent.putExtra(GameActivity.FLAG_SINGLEPLAYER,true);
-        gameSelectActivity.startActivity(intent);
-        gameSelectActivity.finish();
+        if(isLobbySelecting) {
+            Intent intent = new Intent(gameSelectActivity, GameActivity.class);
+            intent.putExtra(GameActivity.FLAG_SINGLEPLAYER, true);
+            gameSelectActivity.startActivity(intent);
+            gameSelectActivity.finish();
+        }
     }
 
     public void onCreateGameClick(){
-        netman.reqCreateGame(this);
+        if(isLobbySelecting) {
+            netman.reqCreateGame(this);
+        }
     }
 
     public void onJoinGameClick(int id){
@@ -57,7 +62,7 @@ public class GameSelectController implements RequestStatusCallback, LobbyReqCall
     @Override
     public void onLobbyUpdateReceived(ArrayList<GameSessionInfo> lobby) {
         gameSelectView.getLobbyListAdapter().changeData(lobby);
-        if(showLobby) {
+        if(isLobbySelecting) {
             gameSelectView.showLobbyView();
         }
     }
@@ -79,7 +84,7 @@ public class GameSelectController implements RequestStatusCallback, LobbyReqCall
                 if (response == Status.OK) {
                     //joined game, now request the lobby info and update the view
                     netman.cancleRequest(lobbyUpdateRequestId);
-                    showLobby = false;
+                    isLobbySelecting = false;
                     netman.reqLobbyList(this, extra);
                     lobbyUpdateRequestId = netman.reqLobbyListRecurring(this, extra, 1000);
                 } else {
@@ -91,7 +96,7 @@ public class GameSelectController implements RequestStatusCallback, LobbyReqCall
                 if (response == Status.OK) {
                     //created game, now request the lobby info to display
                     netman.cancleRequest(lobbyUpdateRequestId);
-                    showLobby = false;
+                    isLobbySelecting = false;
                     netman.reqLobbyList(this, extra);
                     lobbyUpdateRequestId = netman.reqLobbyListRecurring(this, extra, 1000);
                 }
@@ -102,7 +107,7 @@ public class GameSelectController implements RequestStatusCallback, LobbyReqCall
             case REQ_DESTROY:
                 if(response == Status.OK){
                     //we left the game
-                    showLobby = true;
+                    isLobbySelecting = true;
                     //cancle the requests for the lobby we were in
                     netman.cancleRequest(lobbyUpdateRequestId);
                     //new request for getting list of lobbies
@@ -119,7 +124,7 @@ public class GameSelectController implements RequestStatusCallback, LobbyReqCall
     public void onRequestStartGame(){
         //send request to server to start the current game
         //first check if the request should be made (i.e. are we actually in a lobby)
-        if(!showLobby){
+        if(!isLobbySelecting){
             netman.reqStartGame(this);
         }
     }
@@ -127,8 +132,7 @@ public class GameSelectController implements RequestStatusCallback, LobbyReqCall
     //returns true if the back pressed was handled
     public boolean onBackPressed(){
 
-
-        if(!showLobby){
+        if(!isLobbySelecting){
             //if we are not in the lobby select menu exit lobby
             //tell server we left the game lobby
             netman.reqLeaveGame(this);

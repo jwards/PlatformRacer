@@ -22,6 +22,7 @@ class GameSessionListAdapter extends BaseAdapter {
 
     private GameSelectController actionCallback;
     private GameSessionInfo sessionInfo;
+    private ClickLisener clickLisener;
 
     private static final int TITLE_CARD_TAG = -1;
     private static final int HOST_CARD_TAG = -2;
@@ -29,6 +30,7 @@ class GameSessionListAdapter extends BaseAdapter {
 
     public GameSessionListAdapter(Context context){
         this.context = context;
+        this.clickLisener = new ClickLisener();
     }
 
     public void setGameSelectController(GameSelectController gameSelectController){
@@ -73,6 +75,7 @@ class GameSessionListAdapter extends BaseAdapter {
         View view;
         if(convertView == null){
             view = View.inflate(context, R.layout.lobby_list_entry, null);
+            view.setOnClickListener(clickLisener);
         } else {
             view = convertView;
         }
