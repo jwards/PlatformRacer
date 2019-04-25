@@ -151,7 +151,6 @@ class GameSessionListAdapter extends BaseAdapter {
         public void onClick(View v) {
             int tag = (int) v.getTag();
             if (tag == HOST_CARD_TAG) {
-                //TODO start game
                 actionCallback.onRequestStartGame();
             }
         }

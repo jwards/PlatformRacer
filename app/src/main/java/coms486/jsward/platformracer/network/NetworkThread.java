@@ -9,11 +9,13 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.PriorityQueue;
 
+import coms486.jsward.platformracer.User;
 import jsward.platformracer.common.game.GameCore;
 import jsward.platformracer.common.network.CreateGamePacket;
 import jsward.platformracer.common.network.JoinGamePacket;
 import jsward.platformracer.common.network.LobbyPacket;
 import jsward.platformracer.common.network.ReqType;
+import jsward.platformracer.common.network.StartGamePacket;
 import jsward.platformracer.common.network.Status;
 
 import static jsward.platformracer.common.util.Constants.CLIENT_INPUT_POLL_RATE;
@@ -68,11 +70,17 @@ public class NetworkThread extends Thread {
                         if (requestQueue.peek().isReady()) {
                             request = requestQueue.poll();
                             Log.d(DEBUG_TAG, "Executing request: " + request.toString());
+
+                            //tell the request it is being executed
                             request.onExecute();
+
+                            //check if the request should be added back into the queue
                             if (!request.isExpired()) {
                                 requestQueue.add(request);
                                 Log.d(DEBUG_TAG, "Adding event: " + request.toString() + " back into queue");
                             }
+
+                            //if the queue isn't empty, set the next wait time to the next event;
                             if (requestQueue.peek() != null) {
                                 nextWait = requestQueue.peek().getWaitTime();
                                 Log.d(DEBUG_TAG, "Next event: "+requestQueue.peek().toString()+" in ... " + nextWait);
@@ -90,6 +98,9 @@ public class NetworkThread extends Thread {
                                     break;
                                 case REQ_DESTROY:
                                     leaveReq((SimpleRequest) request);
+                                    break;
+                                case REQ_START:
+                                    startReq((SimpleRequest) request);
                                     break;
                             }
                         } else{
@@ -163,7 +174,11 @@ public class NetworkThread extends Thread {
                 Log.d(DEBUG_TAG,"Received: "+lp.toString());
 
                 if(lp.getLobbyId() == -1){
+                    //regular lobby list update
                     req.getCallback().onLobbyUpdateReceived(lp.getInfos());
+                } else if(lp.getLobbyId() == -2){
+                    //the game has been started
+                    req.getCallback().onGameStart();
                 } else if(lp.getInfos().size() == 0){
                     //requested single lobby but couldn't find a lobby with matching id
                     req.getCallback().onSingleLobbyUpdateReceived(null);
@@ -207,11 +222,21 @@ public class NetworkThread extends Thread {
         //send request to create game
         CreateGamePacket cgp = new CreateGamePacket();
         Log.d(DEBUG_TAG,"Sending create game request...");
-        objectOutputStream.writeObject(cgp);
+        objectOutputStream.writeUnshared(cgp);
 
         JoinGamePacket response = (JoinGamePacket) objectInputStream.readUnshared();
         Log.d(DEBUG_TAG, "Recieved: " + response.status);
         req.getCallback().onResponse(ReqType.REQ_CREATE,response.status,response.gameSessionId);
+    }
+
+    private void startReq(SimpleRequest req) throws IOException, ClassNotFoundException {
+        StartGamePacket sgp = new StartGamePacket();
+        Log.d(DEBUG_TAG, "Sending start game request...");
+        objectOutputStream.writeUnshared(sgp);
+
+        StartGamePacket response = (StartGamePacket) objectInputStream.readUnshared();
+        Log.d(DEBUG_TAG,"Received: "+response.status);
+        req.getCallback().onResponse(ReqType.REQ_START,response.status,0);
 
     }
 
@@ -233,6 +258,10 @@ public class NetworkThread extends Thread {
                 objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
                 objectInputStream = new ObjectInputStream(socket.getInputStream());
                 objectOutputStream.flush();
+                //every time we connect, we let the server know who we are
+                objectOutputStream.writeUnshared(User.USER_ID);
+                objectOutputStream.flush();
+
                 Log.d(DEBUG_TAG, "Connection successful");
                 connectionAlive = true;
             } else {

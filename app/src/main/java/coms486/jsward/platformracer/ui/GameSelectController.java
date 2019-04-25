@@ -35,16 +35,9 @@ public class GameSelectController implements RequestStatusCallback, LobbyReqCall
         isLobbySelecting = true;
     }
 
-
-
-
-
     public void onSinglePlayerClick(){
         if(isLobbySelecting) {
-            Intent intent = new Intent(gameSelectActivity, GameActivity.class);
-            intent.putExtra(GameActivity.FLAG_SINGLEPLAYER, true);
-            gameSelectActivity.startActivity(intent);
-            gameSelectActivity.finish();
+            startGame(true);
         }
     }
 
@@ -73,6 +66,11 @@ public class GameSelectController implements RequestStatusCallback, LobbyReqCall
             gameSelectView.getGameSessionListAdapter().changeData(sessionInfo);
             gameSelectView.showSessionView();
         }
+    }
+
+    @Override
+    public void onGameStart() {
+        startGame(false);
     }
 
 
@@ -115,8 +113,10 @@ public class GameSelectController implements RequestStatusCallback, LobbyReqCall
                 }
                 break;
             case REQ_START:
-                //enter the game activity
-
+                //enter the game activity if the response is OK
+                if(response == Status.OK) {
+                    onGameStart();
+                }
                 break;
         }
     }
@@ -124,6 +124,7 @@ public class GameSelectController implements RequestStatusCallback, LobbyReqCall
     public void onRequestStartGame(){
         //send request to server to start the current game
         //first check if the request should be made (i.e. are we actually in a lobby)
+        //When the response is sent back from the server, we enter the game activity.
         if(!isLobbySelecting){
             netman.reqStartGame(this);
         }
@@ -142,5 +143,12 @@ public class GameSelectController implements RequestStatusCallback, LobbyReqCall
             netman.cancleAll();
             return false;
         }
+    }
+
+    private void startGame(boolean isSinglePlayer){
+        Intent intent = new Intent(gameSelectActivity, GameActivity.class);
+        intent.putExtra(GameActivity.FLAG_SINGLEPLAYER, true);
+        gameSelectActivity.startActivity(intent);
+        gameSelectActivity.finish();
     }
 }
