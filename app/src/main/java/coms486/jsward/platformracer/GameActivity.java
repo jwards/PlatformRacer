@@ -53,15 +53,17 @@ public class GameActivity extends AppCompatActivity {
 
         readIntent(getIntent());
 
-        if(!isSinglePlayer){
-            //network stuff
-        }
+
 
         initGame();
         initDisplayButtons();
         initDisplay();
         setController();
 
+
+        if(!isSinglePlayer){
+            //network stuff
+        }
 
 
         displayThread.start();

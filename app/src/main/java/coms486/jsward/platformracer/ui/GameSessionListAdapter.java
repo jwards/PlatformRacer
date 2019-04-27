@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
@@ -75,6 +76,7 @@ class GameSessionListAdapter extends BaseAdapter {
         View view;
         if(convertView == null){
             view = View.inflate(context, R.layout.lobby_list_entry, null);
+           // view.setLayoutParams(new AbsListView.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.MATCH_PARENT));
             view.setOnClickListener(clickLisener);
         } else {
             view = convertView;
@@ -83,16 +85,17 @@ class GameSessionListAdapter extends BaseAdapter {
         TextView tv = view.findViewById(R.id.lobby_entry_text);
 
         if(position == 0){
-            return lobbyTitleCard(tv);
+            lobbyTitleCard(tv);
+            view.setTag(TITLE_CARD_TAG);
+        } else if(position == 1){
+            hostCard(tv);
+            view.setTag(HOST_CARD_TAG);
+        } else {
+            //otherwise just display a player
+            lobbyPlayerEntry(tv, position - 2);
+            view.setTag(position);
         }
-
-        if(position == 1){
-            return hostCard(tv);
-        }
-
-
-        //otherwise just display a player
-        return lobbyPlayerEntry(tv, position - 2);
+        return view;
     }
 
 
@@ -106,19 +109,13 @@ class GameSessionListAdapter extends BaseAdapter {
         });
     }
 
-    private View lobbyTitleCard(View view){
-        TextView tv = (TextView) view;
+    private void lobbyTitleCard(TextView tv){
         tv.setTextColor(Color.BLUE);
         tv.setText("Capacity: " + sessionInfo.capacity + " / " + sessionInfo.maxCapacity);
-
-        tv.setTag(TITLE_CARD_TAG);
-        return tv;
     }
 
-    private View lobbyPlayerEntry(View view,int playerPosition){
+    private void lobbyPlayerEntry(TextView name,int playerPosition){
         String playerName = (String) getItem(playerPosition);
-        TextView name = (TextView) view;
-
         if(playerName == null){
             name.setText("Empty");
         } else {
@@ -129,20 +126,15 @@ class GameSessionListAdapter extends BaseAdapter {
             }
             name.setText(playerName);
         }
-        view.setTag(playerPosition);
-        return view;
     }
 
-    private View hostCard(View view){
-        TextView tv = (TextView) view;
+    private void hostCard(TextView tv){
         if(sessionInfo.ready()) {
             tv.setTextColor(Color.GREEN);
         } else {
             tv.setTextColor(Color.RED);
         }
         tv.setText("START GAME");
-        tv.setTag(HOST_CARD_TAG);
-        return tv;
     }
 
     private class ClickLisener implements View.OnClickListener{

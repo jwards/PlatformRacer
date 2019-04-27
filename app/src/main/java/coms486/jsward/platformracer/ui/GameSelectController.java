@@ -27,6 +27,9 @@ public class GameSelectController implements RequestStatusCallback, LobbyReqCall
     //false when we are in a game lobby
     private boolean isLobbySelecting;
 
+    //used to stop multiple game activities from being started
+    private boolean startingGame = false;
+
     public GameSelectController(GameSelectActivity gameSelectActivity, GameSelectViewFragment gameSelectView){
         this.gameSelectActivity = gameSelectActivity;
         this.gameSelectView = gameSelectView;
@@ -69,8 +72,12 @@ public class GameSelectController implements RequestStatusCallback, LobbyReqCall
     }
 
     @Override
-    public void onGameStart() {
-        startGame(false);
+    public synchronized void onGameStart() {
+        if(!startingGame) {
+            netman.cancleAll();
+            startingGame = true;
+            startGame(false);
+        }
     }
 
 
@@ -113,15 +120,12 @@ public class GameSelectController implements RequestStatusCallback, LobbyReqCall
                 }
                 break;
             case REQ_START:
-                //enter the game activity if the response is OK
-                if(response == Status.OK) {
-                    onGameStart();
-                }
+                //the game is started when onGameStart is called from the network thread
                 break;
         }
     }
 
-    public void onRequestStartGame(){
+    public synchronized void onRequestStartGame(){
         //send request to server to start the current game
         //first check if the request should be made (i.e. are we actually in a lobby)
         //When the response is sent back from the server, we enter the game activity.
@@ -147,7 +151,7 @@ public class GameSelectController implements RequestStatusCallback, LobbyReqCall
 
     private void startGame(boolean isSinglePlayer){
         Intent intent = new Intent(gameSelectActivity, GameActivity.class);
-        intent.putExtra(GameActivity.FLAG_SINGLEPLAYER, true);
+        intent.putExtra(GameActivity.FLAG_SINGLEPLAYER, isSinglePlayer);
         gameSelectActivity.startActivity(intent);
         gameSelectActivity.finish();
     }

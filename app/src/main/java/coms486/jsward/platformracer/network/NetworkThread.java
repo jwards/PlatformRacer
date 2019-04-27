@@ -27,9 +27,9 @@ public class NetworkThread extends Thread {
     private static final String DEBUG_TAG = "NETWORK_THREAD";
 
     //desktop
-    private static final String SERVER_ADDR  = "desktop-93rq231.student.iastate.edu";
+    //private static final String SERVER_ADDR  = "desktop-93rq231.student.iastate.edu";
     //laptop
-    //private static final String SERVER_ADDR  = "desktop-rqgu2tp.student.iastate.edu";
+    private static final String SERVER_ADDR  = "desktop-rqgu2tp.student.iastate.edu";
 
     private NetworkManager callback;
     private Socket socket;
@@ -88,19 +88,19 @@ public class NetworkThread extends Thread {
 
                             switch (request.getType()) {
                                 case REQ_JOIN:
-                                    joinReq((SimpleRequest) request);
+                                    sendJoinRequest((SimpleRequest) request);
                                     break;
                                 case REQ_CREATE:
-                                    createReq((SimpleRequest) request);
+                                    sendCreateRequest((SimpleRequest) request);
                                     break;
                                 case REQ_LOBBY_LIST:
-                                    lobbyReq((LobbyUpdateRequest) request);
+                                    sendLobbyRequest((LobbyUpdateRequest) request);
                                     break;
                                 case REQ_DESTROY:
-                                    leaveReq((SimpleRequest) request);
+                                    sendLeaveRequest((SimpleRequest) request);
                                     break;
                                 case REQ_START:
-                                    startReq((SimpleRequest) request);
+                                    sendStartRequest((SimpleRequest) request);
                                     break;
                             }
                         } else{
@@ -161,82 +161,114 @@ public class NetworkThread extends Thread {
     }
 
 
-    private void lobbyReq(LobbyUpdateRequest req) throws IOException, ClassNotFoundException {
+    private void sendLobbyRequest(LobbyUpdateRequest req) throws IOException, ClassNotFoundException {
         //send request for lobby list
         Log.d(DEBUG_TAG, "Sending lobby update request...");
         objectOutputStream.writeObject(new LobbyPacket(null,req.getLobbyId()));
+        getAndHandleResponse(req);
+    }
 
-        Object obj = objectInputStream.readUnshared();
+    private void onLobbyResponse(LobbyPacket response, LobbyUpdateRequest request) {
+        Log.d(DEBUG_TAG, "Received: " + response.toString());
 
-        if(obj != null){
-            if(obj instanceof LobbyPacket){
-                LobbyPacket lp = (LobbyPacket) obj;
-                Log.d(DEBUG_TAG,"Received: "+lp.toString());
-
-                if(lp.getLobbyId() == -1){
-                    //regular lobby list update
-                    req.getCallback().onLobbyUpdateReceived(lp.getInfos());
-                } else if(lp.getLobbyId() == -2){
-                    //the game has been started
-                    req.getCallback().onGameStart();
-                } else if(lp.getInfos().size() == 0){
-                    //requested single lobby but couldn't find a lobby with matching id
-                    req.getCallback().onSingleLobbyUpdateReceived(null);
-                } else {
-                    req.getCallback().onSingleLobbyUpdateReceived(lp.getInfos().get(0));
-                }
-            } else {
-                Log.d(DEBUG_TAG,"Error receiving LobbyUpdatePacket. Wrong class: "+obj.toString());
-            }
+        if (response.getLobbyId() == -1) {
+            //regular lobby list update
+            request.getCallback().onLobbyUpdateReceived(response.getInfos());
+        } else if (response.getInfos().size() == 0) {
+            //requested single lobby but couldn't find a lobby with matching id
+            request.getCallback().onSingleLobbyUpdateReceived(null);
         } else {
-            Log.d(DEBUG_TAG,"Error receiving LobbyUpdatePacket. Null class");
+            request.getCallback().onSingleLobbyUpdateReceived(response.getInfos().get(0));
         }
     }
 
-    private void joinReq(SimpleRequest req) throws IOException, ClassNotFoundException {
+    private void sendJoinRequest(SimpleRequest req) throws IOException, ClassNotFoundException {
         //send request to join a game
         JoinGamePacket jgp = new JoinGamePacket(req.getExtra());
         Log.d(DEBUG_TAG,"Sending join game request: "+jgp.toString());
         objectOutputStream.writeUnshared(jgp);
 
         Log.d(DEBUG_TAG, "Waiting for repsonse...");
-        JoinGamePacket response = (JoinGamePacket) objectInputStream.readUnshared();
-        Log.d(DEBUG_TAG, "Received: " + response.status);
-        req.getCallback().onResponse(ReqType.REQ_JOIN, response.status,response.gameSessionId);
+        getAndHandleResponse(req);
     }
 
-    private void leaveReq(SimpleRequest req) throws IOException, ClassNotFoundException {
+    private void onJoinResponse(JoinGamePacket response,SimpleRequest request){
+        Log.d(DEBUG_TAG, "Received: " + response.status);
+        request.getCallback().onResponse(ReqType.REQ_JOIN, response.status,response.gameSessionId);
+    }
+
+    private void sendLeaveRequest(SimpleRequest req) throws IOException, ClassNotFoundException {
         //send join packet with id -1
         JoinGamePacket jgp = new JoinGamePacket(req.getExtra());
         Log.d(DEBUG_TAG,"Sending leave game request: "+jgp.toString());
         objectOutputStream.writeUnshared(jgp);
-
         Log.d(DEBUG_TAG, "Waiting for response...");
-        JoinGamePacket response = (JoinGamePacket) objectInputStream.readUnshared();
-        Log.d(DEBUG_TAG, "Recieved: " + response.status);
-        req.getCallback().onResponse(ReqType.REQ_DESTROY,response.status,response.gameSessionId);
-
+        getAndHandleResponse(req);
     }
 
-    private void createReq(SimpleRequest req) throws IOException, ClassNotFoundException {
+    private void onLeaveResponse(JoinGamePacket response,SimpleRequest request){
+        Log.d(DEBUG_TAG, "Recieved: " + response.status);
+        request.getCallback().onResponse(ReqType.REQ_DESTROY,response.status,response.gameSessionId);
+    }
+
+    private void sendCreateRequest(SimpleRequest req) throws IOException, ClassNotFoundException {
         //send request to create game
         CreateGamePacket cgp = new CreateGamePacket();
         Log.d(DEBUG_TAG,"Sending create game request...");
         objectOutputStream.writeUnshared(cgp);
-
-        JoinGamePacket response = (JoinGamePacket) objectInputStream.readUnshared();
-        Log.d(DEBUG_TAG, "Recieved: " + response.status);
-        req.getCallback().onResponse(ReqType.REQ_CREATE,response.status,response.gameSessionId);
+        getAndHandleResponse(req);
     }
 
-    private void startReq(SimpleRequest req) throws IOException, ClassNotFoundException {
+    private void onCreateResponse(CreateGamePacket response,SimpleRequest request){
+        Log.d(DEBUG_TAG, "Recieved: " + response.status);
+        request.getCallback().onResponse(ReqType.REQ_CREATE,response.status,response.gameSessionId);
+    }
+
+    private void sendStartRequest(SimpleRequest req) throws IOException, ClassNotFoundException {
         StartGamePacket sgp = new StartGamePacket();
         Log.d(DEBUG_TAG, "Sending start game request...");
         objectOutputStream.writeUnshared(sgp);
+        getAndHandleResponse(req);
+    }
 
-        StartGamePacket response = (StartGamePacket) objectInputStream.readUnshared();
+    //this is called when the server tells the client to start the game
+    private void onStartResponse(StartGamePacket response,LobbyUpdateRequest request){
         Log.d(DEBUG_TAG,"Received: "+response.status);
-        req.getCallback().onResponse(ReqType.REQ_START,response.status,0);
+        if(response.status == Status.OK) {
+            request.getCallback().onGameStart();
+        }
+    }
+
+    //this is called in response to a request to start the game
+    //The game doesn't actually start until a separate response from the server
+    private void onStartResponse(StartGamePacket response,SimpleRequest request){
+        Log.d(DEBUG_TAG,"Received: "+response.status + " in response to: "+ReqType.REQ_START);
+        Log.d(DEBUG_TAG, "Game will start shortly...");
+    }
+
+    private void getAndHandleResponse(NetRequest request) throws IOException, ClassNotFoundException {
+        Object obj = objectInputStream.readUnshared();
+
+        if (obj instanceof LobbyPacket) {
+            onLobbyResponse((LobbyPacket) obj,(LobbyUpdateRequest) request);
+        } else if (obj instanceof JoinGamePacket) {
+            JoinGamePacket jgp = (JoinGamePacket) obj;
+            if(jgp.gameSessionId == -1){
+                //leave game response
+                onLeaveResponse(jgp,(SimpleRequest)request);
+            } else {
+                //join game response
+                onJoinResponse(jgp,(SimpleRequest)request);
+            }
+        } else if (obj instanceof CreateGamePacket) {
+            onCreateResponse((CreateGamePacket) obj,(SimpleRequest)request);
+        } else if (obj instanceof StartGamePacket) {
+            if(request instanceof LobbyUpdateRequest){
+                onStartResponse((StartGamePacket)obj,(LobbyUpdateRequest) request);
+            } else {
+                onStartResponse((StartGamePacket) obj, (SimpleRequest) request);
+            }
+        }
 
     }
 
