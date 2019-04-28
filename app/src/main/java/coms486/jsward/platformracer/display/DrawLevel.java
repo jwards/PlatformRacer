@@ -10,7 +10,10 @@ import android.graphics.RectF;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 
+import coms486.jsward.platformracer.User;
 import jsward.platformracer.common.game.PlatformLevel;
 import jsward.platformracer.common.game.Player;
 
@@ -32,7 +35,7 @@ public class DrawLevel implements Drawable {
 
 
     private Player player;
-    private ArrayList<Player> otherPlayers;
+    private Collection<Player> players;
     private Paint terrainPaint;
 
     private ArrayList<Bitmap> playerSprite;
@@ -51,12 +54,9 @@ public class DrawLevel implements Drawable {
 
     private float[] transformedPoints;
 
-    public DrawLevel(Player player,ArrayList<Player> others, ArrayList<Bitmap> playerSprite, Point displaySize){
-        this.player = player;
-        this.otherPlayers = others;
+    public DrawLevel(ArrayList<Bitmap> playerSprite, Point displaySize){
         this.playerSprite = playerSprite;
         this.displaySize = displaySize;
-
 
         terrainPaint = new Paint();
         terrainPaint.setColor(Color.GREEN);
@@ -112,15 +112,25 @@ public class DrawLevel implements Drawable {
 
         playerAnimator.drawPlayer(player,canvas,playerMatrix,playerScale,PLAYER_X_OFFSET,playerpt[1]);
 
-        if(otherPlayers!=null) {
-            for (Player p : otherPlayers) {
-                playerpt[0] = p.getX();
-                playerpt[1] = p.getY();
-                viewMatrix.mapPoints(playerpt);
-                //the player matrix is reset each time so we can resuse it
-                playerAnimator.drawPlayer(p, canvas, playerMatrix, playerScale,(int) playerpt[0], playerpt[1]);
+        if(players!=null) {
+            for (Player p : players) {
+                //don't draw the local player twice
+                if(p != player) {
+                    playerpt[0] = p.getX();
+                    playerpt[1] = p.getY();
+                    viewMatrix.mapPoints(playerpt);
+                    //the player matrix is reset each time so we can resuse it
+                    playerAnimator.drawPlayer(p, canvas, playerMatrix, playerScale, (int) playerpt[0], playerpt[1]);
+                }
             }
         }
     }
 
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+
+    public void setPlayerList(ArrayList<Player> allPlayers) {
+        this.players = allPlayers;
+    }
 }

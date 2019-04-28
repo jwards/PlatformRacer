@@ -9,6 +9,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.PriorityQueue;
 
+import coms486.jsward.platformracer.GameActivity;
 import coms486.jsward.platformracer.User;
 import jsward.platformracer.common.game.GameCore;
 import jsward.platformracer.common.network.CreateGamePacket;
@@ -18,9 +19,8 @@ import jsward.platformracer.common.network.ReqType;
 import jsward.platformracer.common.network.StartGamePacket;
 import jsward.platformracer.common.network.Status;
 
-import static jsward.platformracer.common.util.Constants.CLIENT_INPUT_POLL_RATE;
+
 import static jsward.platformracer.common.util.Constants.SERVER_PORT;
-import static jsward.platformracer.common.util.Constants.SERVER_UPDATE_RATE;
 
 public class NetworkThread extends Thread {
 
@@ -35,9 +35,9 @@ public class NetworkThread extends Thread {
     private ObjectInputStream objectInputStream;
     private ObjectOutputStream objectOutputStream;
 
-    private GameReceiveThread gameReceiveThread;
-    private GameSendThread gameSendThread;
+    private GameCommunicationThread gameCommunicationThread;
 
+    private GameActivity gameActivity;
     private GameCore gameCore;
 
     private boolean connectionAlive;
@@ -120,7 +120,7 @@ public class NetworkThread extends Thread {
                 if(inGame){
                     //wait for gameCore to be set
                     while(gameCore == null){
-                        wait();
+                        wait(250);
                     }
 
                     beginGame(gameCore);
@@ -185,14 +185,22 @@ public class NetworkThread extends Thread {
     //begins sending and requesting game updates
     //will block until the game is done
     private void beginGame(GameCore gameCore) throws IOException, InterruptedException {
-        gameReceiveThread = new GameReceiveThread(SERVER_UPDATE_RATE, objectInputStream, gameCore);
-        gameSendThread = new GameSendThread(CLIENT_INPUT_POLL_RATE, objectOutputStream, gameCore.getPlayerController());
-        //begin game communication
-        gameReceiveThread.start();
-        gameSendThread.start();
+        gameCommunicationThread = new GameCommunicationThread(objectInputStream,objectOutputStream, gameCore);
 
-        gameReceiveThread.join();
-        gameSendThread.join();
+        //receive game init info
+        //this loads the player and player controller data into the local gamecore
+        gameCommunicationThread.getGameInfo();
+
+        //tell the activity that we got the player info
+        gameActivity.onGameCoreInit();
+
+        //don't keep the reference to the activity
+        gameActivity = null;
+
+        //begin game communication
+        gameCommunicationThread.start();
+
+        gameCommunicationThread.join();
     }
 
 
@@ -354,5 +362,9 @@ public class NetworkThread extends Thread {
         }catch (IOException e){
             Log.d(DEBUG_TAG, Log.getStackTraceString(e));
         }
+    }
+
+    public void setGameInitCallback(GameActivity gameActivity) {
+        this.gameActivity = gameActivity;
     }
 }

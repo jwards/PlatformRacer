@@ -36,6 +36,9 @@ public class GameActivity extends AppCompatActivity {
 
     private GameDisplay gameDisplay;
     private DisplayThread displayThread;
+    private DrawLevel levelDrawer;
+    private GameDrawer gameDrawer;
+    private ArrayList<Bitmap> playerSprites;
 
     private static boolean displaying;
 
@@ -67,9 +70,6 @@ public class GameActivity extends AppCompatActivity {
             finish();
         }
 
-        readIntent(getIntent());
-
-
         //calcuate uiScale
         displaySize = new Point();
         getWindowManager().getDefaultDisplay().getSize(displaySize);
@@ -82,19 +82,26 @@ public class GameActivity extends AppCompatActivity {
             uiScale = 1.5f;
         }
 
+        readIntent(getIntent());
+
         Log.d(DEBUG_TAG, "Initializing game...");
         initGame();
+
         Log.d(DEBUG_TAG, "Initializing buttons...");
         initDisplayButtons();
         Log.d(DEBUG_TAG, "Initializing display...");
         initDisplay();
 
-        setController();
-
-
         if(!isSinglePlayer){
-            NetworkManager.getInstance().beginGame(gameCore);
+            NetworkManager.getInstance().beginGame(gameCore,this);
         }
+
+        if(isSinglePlayer){
+            //if this is singleplayer this won't be called by the network thread so we call it here instead
+            onGameCoreInit();
+        }
+
+
         displaying = false;
 
     }
@@ -102,11 +109,6 @@ public class GameActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if(!displaying) {
-            displayThread.start();
-            gameThread.start();
-            displaying = true;
-        }
     }
 
     @Override
@@ -146,22 +148,33 @@ public class GameActivity extends AppCompatActivity {
         //load player sprites
         Bitmap playerSprite = BitmapUtil.getBitmapFromAsset(this, "player_sprite.png");
 
-        ArrayList<Bitmap> psprites = new ArrayList<>();
+        playerSprites = new ArrayList<>();
 
         for(int i = 0;i<6;i++){
-            psprites.add(Bitmap.createBitmap(playerSprite, 100 * i, 0, 100, 150));
+            playerSprites.add(Bitmap.createBitmap(playerSprite, 100 * i, 0, 100, 150));
         }
 
-        GameDrawer gameDrawer = new GameDrawer(gameDisplay);
-        DrawLevel levelDrawer = new DrawLevel(gameCore.getPlayer(),gameCore.getOpponents(), psprites,displaySize);
-        gameDrawer.addDrawable(levelDrawer);
-
+        gameDrawer = new GameDrawer(gameDisplay);
         displayThread = new DisplayThread(gameDisplay.getHolder(), gameDrawer);
     }
 
     private void setController(){
-        InputController controller = new InputController(gameDisplay, gameCore.getPlayerController());
+        InputController controller = new InputController(gameDisplay, gameCore.getPlayerController(User.USER_ID));
         gameDisplay.setOnTouchListener(controller);
+    }
+
+    //called when the game core has been updated with the player info from the server
+    public void onGameCoreInit(){
+        levelDrawer = new DrawLevel(playerSprites,displaySize);
+        gameDrawer.addDrawable(levelDrawer);
+        levelDrawer.setPlayer(gameCore.getPlayer(User.USER_ID));
+        levelDrawer.setPlayerList(gameCore.getAllPlayers());
+        setController();
+        if(!displaying) {
+            displayThread.start();
+            gameThread.start();
+            displaying = true;
+        }
     }
 
 

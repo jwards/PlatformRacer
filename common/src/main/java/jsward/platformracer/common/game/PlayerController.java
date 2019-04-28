@@ -16,7 +16,6 @@ public class PlayerController {
 
     private PlatformLevel level;
     private Player p;
-    private long controlsActive = 0;
 
     public PlayerController(PlatformLevel level,Player p){
         this.level = level;
@@ -27,13 +26,13 @@ public class PlayerController {
 
         p.setVy(p.getVy()+GRAVITY);
 
-        if ((controlsActive & BUTTON_JUMP) != 0) {
+        if ((p.controls & BUTTON_JUMP) != 0) {
             jump();
         }
 
-        if ((controlsActive & BUTTON_LEFT) != 0) {
+        if ((p.controls & BUTTON_LEFT) != 0) {
             move(-1);
-        } else if ((controlsActive & BUTTON_RIGHT) != 0) {
+        } else if ((p.controls & BUTTON_RIGHT) != 0) {
             move(1);
         } else {
             //decelerate if not moving
@@ -46,11 +45,15 @@ public class PlayerController {
     }
 
     public long getControlsActive(){
-        return controlsActive;
+        return p.controls;
     }
 
     public void setControlsActive(long controlsActive){
-        this.controlsActive = controlsActive;
+        p.controls= controlsActive;
+    }
+
+    public String getId(){
+        return p.getId();
     }
 
 
@@ -71,11 +74,11 @@ public class PlayerController {
     //called by the ui thread to set which buttons are pressed
     //apply masks to control to see which buttons are active
     public void activate(long control){
-        controlsActive = controlsActive | control;
+        p.controls = p.controls| control;
     }
 
     public void deactivate(long control){
-        controlsActive = controlsActive & ~control;
+        p.controls= p.controls& ~control;
     }
 
 

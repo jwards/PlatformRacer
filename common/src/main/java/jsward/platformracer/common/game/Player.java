@@ -5,6 +5,7 @@ import java.io.Serializable;
 
 public class Player implements Serializable {
 
+    private String id;
     private float x;
     private float y;
     private float vx;
@@ -14,16 +15,18 @@ public class Player implements Serializable {
     private float maxJumpSpeed;
     private float maxSpeedX;
     private boolean canJump;
+    public long controls;
 
 
 
-    public Player(float x,float y,float accel,float maxSpeedX,float maxFallSpeed,float maxJumpSpeed){
+    public Player(float x,float y,float accel,float maxSpeedX,float maxFallSpeed,float maxJumpSpeed,String id){
         this.accel = accel;
         this.maxSpeedX = maxSpeedX;
         this.maxFallSpeed = maxFallSpeed;
         this.maxJumpSpeed = maxJumpSpeed;
         this.x=x;
         this.y=y;
+        this.id = id;
     }
 
     public float getX(){
@@ -74,6 +77,10 @@ public class Player implements Serializable {
         return canJump;
     }
 
+    public String getId(){
+        return id;
+    }
+
     private float bound(float test,float lb,float ub){
         if(test<lb){
             return lb;
@@ -82,6 +89,10 @@ public class Player implements Serializable {
             return ub;
         }
         return test;
+    }
+
+    public String toString(){
+        return "[" + x + ", " + y + ", " + vx + ", " + vy + ", " + id + ", " + "]";
     }
 
 }
