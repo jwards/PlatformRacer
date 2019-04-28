@@ -86,6 +86,7 @@ public class DrawLevel implements Drawable {
         PLAYER_X_OFFSET = (int)(0.27f * displaySize.x);
 
         //calculate scale to draw player
+        //.1388 is 150/1080 which is the original scale
         scale = (displaySize.y*0.1388f)/150;
 
         playerScale = new Matrix();

@@ -29,27 +29,33 @@ public class InputController implements View.OnTouchListener {
         //bug: when secondary pointer is released, any button it's pressing will not be deactivated
         //until the next MotionEvent.
         if (maskedAction == MotionEvent.ACTION_MOVE) {
-            //reset all buttons
-            playerController.deactivate(~0);
-            for (int i = 0; i < pointerCount; i++) {
-                pointDown[0] = event.getX(i);
-                pointDown[1] = event.getY(i);
-                long button = getButton(pointDown);
-                playerController.activate(button);
-            }
+            updateButtons(pointerCount,event);
         }
 
         if (event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_POINTER_DOWN) {
             //subscribe to event
+            updateButtons(pointerCount,event);
             return true;
         }
-        if (event.getAction() == MotionEvent.ACTION_UP) {
-            //upress all buttons
-            playerController.deactivate(~0);
-            return true;
+        if(maskedAction == MotionEvent.ACTION_UP || maskedAction == MotionEvent.ACTION_POINTER_UP){
+            //find which button was pressed and deactivate it
+            pointDown[0] = event.getX(event.getActionIndex());
+            pointDown[1] = event.getY(event.getActionIndex());
+            playerController.deactivate(getButton(pointDown));
         }
 
         return false;
+    }
+
+    private void updateButtons(int pointerCount,MotionEvent event){
+        //reset all buttons
+        playerController.deactivate(~0);
+        for (int i = 0; i < pointerCount; i++) {
+            pointDown[0] = event.getX(i);
+            pointDown[1] = event.getY(i);
+            long button = getButton(pointDown);
+            playerController.activate(button);
+        }
     }
 
 

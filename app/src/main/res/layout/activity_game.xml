@@ -1,13 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<coms486.jsward.platformracer.display.GameDisplay android:id="@+id/gameDisplay"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-
-    <coms486.jsward.platformracer.display.GameDisplay
-        android:id="@+id/gameDisplay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </coms486.jsward.platformracer.display.GameDisplay>
-</LinearLayout>
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+</coms486.jsward.platformracer.display.GameDisplay>
