@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.graphics.RectF;
 import android.util.Log;
 
@@ -16,7 +17,7 @@ import jsward.platformracer.common.game.Player;
 public class DrawLevel implements Drawable {
 
     private static final String DEBUG_TAG = "DRAW_LEVEL";
-    public static final int PLAYER_X_OFFSET = 600;
+    public int PLAYER_X_OFFSET;
 
     //hitbox for the current sprite
     //need to tick this if sprite changes/ sprite is scaled differently
@@ -40,6 +41,11 @@ public class DrawLevel implements Drawable {
     private int playerSpriteCx;
     private int playerSpriteCy;
 
+    private Point displaySize;
+    private float scale;
+
+    private Matrix playerScale;
+
     private Matrix viewMatrix;
     private RectF viewBox;
     private RectF displayWindow;
@@ -48,25 +54,42 @@ public class DrawLevel implements Drawable {
 
 
     //1080x2076
-    public DrawLevel(Player player, ArrayList<Bitmap> playerSprite){
+    public DrawLevel(Player player, ArrayList<Bitmap> playerSprite, Point displaySize){
         this.player = player;
         this.playerSprite = playerSprite;
+        this.displaySize = displaySize;
+
 
         terrainPaint = new Paint();
         terrainPaint.setColor(Color.GREEN);
         viewMatrix = new Matrix();
         playerMatrix = new Matrix();
+
         playerSpriteCx = playerSprite.get(0).getWidth()/2;
         playerSpriteCy = playerSprite.get(0).getHeight() / 2;
 
+        //view box in terms of game coords
         viewBox = new RectF(0, 0, 300, 150);
-        displayWindow = new RectF(0,0,2076,1080);
+
+        //display box in terms of display pixels
+        displayWindow = new RectF(0,0,displaySize.x,displaySize.y);
+
         transformedPoints = new float[PlatformLevel.lpts.length];
 
         getPlayerHitbox();
+
         for (int i = 0; i < playerHitbox.length; i++) {
             Log.d(DEBUG_TAG, "playerhitbox: " + transformedHitbox[i]);
         }
+
+        //set player x offset
+        PLAYER_X_OFFSET = (int)(0.27f * displaySize.x);
+
+        //calculate scale to draw player
+        scale = (displaySize.y*0.1388f)/150;
+
+        playerScale = new Matrix();
+        playerScale.setScale(scale,scale);
     }
 
     public float[] getPlayerHitbox(){
@@ -113,6 +136,7 @@ public class DrawLevel implements Drawable {
             animationFrame = 0;
             animationCounter = 0;
         }
+        playerMatrix.postConcat(playerScale);
         playerMatrix.postTranslate(PLAYER_X_OFFSET,transformedpy);
         canvas.drawBitmap(playerSprite.get(animationFrame),playerMatrix,null);
     }

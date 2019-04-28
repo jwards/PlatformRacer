@@ -68,4 +68,8 @@ public abstract class TickerThread extends Thread {
 
     }
 
+    public void stopRunning(){
+        running = false;
+    }
+
 }

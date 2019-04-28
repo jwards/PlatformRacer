@@ -14,7 +14,7 @@ public class DisplayThread extends Thread {
     private double averageFPS;
     private final SurfaceHolder surfaceHolder;
     private GameDrawer gameDrawer;
-    private boolean running;
+    private boolean running,display;
     private Object lock = new Object();
 
     private static Canvas canvas;
@@ -37,7 +37,8 @@ public class DisplayThread extends Thread {
         long targetTime = 1000/MAX_FPS;
 
         running = true;
-        while(true){
+        display = true;
+        while(display){
             if(running) {
                 startTime = System.nanoTime();
                 canvas = null;
@@ -97,6 +98,20 @@ public class DisplayThread extends Thread {
             }
         }
 
+    }
+
+
+    public void stopDisplay(){
+        display = false;
+    }
+
+    public void pauseDisplay(){
+        running = false;
+    }
+
+    public void resumeDisplay(){
+        running = true;
+        lock.notify();
     }
 
 }

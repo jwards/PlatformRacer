@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -15,6 +16,8 @@ import java.util.List;
 
 public class GameDisplay extends SurfaceView implements SurfaceHolder.Callback {
 
+
+    private static final String DEBUG_TAG = "GAME_DISPLAY";
     private List<SVButton> buttons;
     private Paint background;
 
@@ -34,6 +37,7 @@ public class GameDisplay extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     private void init(Context context){
+        Log.d(DEBUG_TAG, "Initializing GameDisplay...");
         buttons = new LinkedList<>();
         background = new Paint();
         background.setColor(Color.GRAY);

@@ -11,15 +11,13 @@ public class SVButton implements Drawable{
     private Matrix btnMatrix;
     private Matrix btnMatrixInverse;
     private RectF btnBox;
-    private float width;
-    private float height;
+    private float scale;
     private long tag;
     Bitmap sprite;
 
 
-    public SVButton(float width, float height,float px,float py, long tag, Bitmap sprite){
-        this.width = width;
-        this.height = height;
+    public SVButton(float scale,float px,float py, long tag, Bitmap sprite){
+        this.scale = scale;
         this.sprite = sprite;
         this.tag=tag;
         btnBox = new RectF(0, 0, sprite.getWidth(), sprite.getHeight());
@@ -27,10 +25,7 @@ public class SVButton implements Drawable{
         btnMatrixInverse = new Matrix();
         btnMatrix.invert(btnMatrixInverse);
 
-        float sx,sy;
-        sx = width/sprite.getWidth();
-        sy = height / sprite.getHeight();
-        setPosition(px,py,sx,sy);
+        setPosition(px,py,scale,scale);
 
     }
 
@@ -38,6 +33,7 @@ public class SVButton implements Drawable{
         return inButton(pointDown)&&inButton(pointUp);
     }
 
+    //sets the position to x,y with scale
     public void setPosition(float x,float y,float sx,float sy) {
         btnMatrix.setTranslate(x, y);
         btnMatrix.preScale(sx, sy);

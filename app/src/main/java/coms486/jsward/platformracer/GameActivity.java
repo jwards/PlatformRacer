@@ -2,6 +2,7 @@ package coms486.jsward.platformracer;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -35,13 +36,27 @@ public class GameActivity extends AppCompatActivity {
     private GameDisplay gameDisplay;
     private DisplayThread displayThread;
 
+    private static boolean displaying;
+
+    private Point displaySize;
+
+    //used to uiScale the ui
+    private float uiScale;
+
+    //button relative positions
+    private final float B_UP_X = 0.8f;
+    private final float B_UP_Y = 0.85f;
+
+    private final float B_LEFT_X = 0.05f;
+    private final float B_LEFT_Y = 0.85f;
+
+    private final float B_RIGHT_X = 0.13f;
+    private final float B_RIGHT_Y = 0.85f;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
-
-
 
         //initialize the display
         gameDisplay = findViewById(R.id.gameDisplay);
@@ -54,20 +69,50 @@ public class GameActivity extends AppCompatActivity {
         readIntent(getIntent());
 
 
+        //calcuate uiScale
+        displaySize = new Point();
+        getWindowManager().getDefaultDisplay().getSize(displaySize);
 
+        if(displaySize.x <1400){
+            uiScale = .9f;
+        } else if(displaySize.x <2000){
+            uiScale = 1.2f;
+        } else {
+            uiScale = 1.5f;
+        }
+
+        Log.d(DEBUG_TAG, "Initializing game...");
         initGame();
+        Log.d(DEBUG_TAG, "Initializing buttons...");
         initDisplayButtons();
+        Log.d(DEBUG_TAG, "Initializing display...");
         initDisplay();
+
         setController();
 
 
         if(!isSinglePlayer){
             //network stuff
         }
+        displaying = false;
 
+    }
 
-        displayThread.start();
-        gameThread.start();
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(!displaying) {
+            displayThread.start();
+            gameThread.start();
+            displaying = true;
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        displayThread.stopDisplay();
+        gameThread.stopRunning();
     }
 
     private void initGame(){
@@ -89,10 +134,11 @@ public class GameActivity extends AppCompatActivity {
         Bitmap btnLeft = Bitmap.createBitmap(buttonSprites, 99, 0, 99, 99);
         Bitmap btnUp = Bitmap.createBitmap(buttonSprites, 198, 0, 99, 99);
 
-        //TODO make button location relative to screen size
-        gameDisplay.addButton(new SVButton(150,150,100,950, PlayerController.BUTTON_LEFT,btnLeft));
-        gameDisplay.addButton(new SVButton(150,150,300,950,PlayerController.BUTTON_RIGHT,btnRight));
-        gameDisplay.addButton(new SVButton(150,150,1800,950,PlayerController.BUTTON_JUMP,btnUp));
+
+
+        gameDisplay.addButton(new SVButton(uiScale,displaySize.x*B_LEFT_X,displaySize.y*B_LEFT_Y, PlayerController.BUTTON_LEFT,btnLeft));
+        gameDisplay.addButton(new SVButton(uiScale,displaySize.x*B_RIGHT_X,displaySize.y*B_RIGHT_Y,PlayerController.BUTTON_RIGHT,btnRight));
+        gameDisplay.addButton(new SVButton(uiScale,displaySize.x*B_UP_X,displaySize.y*B_UP_Y,PlayerController.BUTTON_JUMP,btnUp));
     }
 
     private void initDisplay() {
@@ -106,7 +152,7 @@ public class GameActivity extends AppCompatActivity {
         }
 
         GameDrawer gameDrawer = new GameDrawer(gameDisplay);
-        DrawLevel levelDrawer = new DrawLevel(gameCore.getPlayer(), psprites);
+        DrawLevel levelDrawer = new DrawLevel(gameCore.getPlayer(), psprites,displaySize);
         gameDrawer.addDrawable(levelDrawer);
 
         displayThread = new DisplayThread(gameDisplay.getHolder(), gameDrawer);
