@@ -21,7 +21,7 @@ public class GameReceiveThread extends TickerThread {
     private GameCore gameCore;
 
     public GameReceiveThread(int maxTPS, ObjectInputStream objectInputStream, GameCore gameCore) throws IOException {
-        super(maxTPS,true,new AndroidLogger());
+        super(maxTPS,false,new AndroidLogger());
         this.gameCore = gameCore;
         input = objectInputStream;
 
@@ -30,7 +30,7 @@ public class GameReceiveThread extends TickerThread {
     private void readUpdate(){
         GameUpdatePacket gup = null;
         try {
-            Object obj = input.readObject();
+            Object obj = input.readUnshared();
             if (obj != null) {
                 if (obj instanceof GameUpdatePacket) {
                     gup = (GameUpdatePacket) obj;

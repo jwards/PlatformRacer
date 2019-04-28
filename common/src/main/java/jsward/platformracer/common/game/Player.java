@@ -1,8 +1,9 @@
 package jsward.platformracer.common.game;
 
 
+import java.io.Serializable;
 
-public class Player {
+public class Player implements Serializable {
 
     private float x;
     private float y;

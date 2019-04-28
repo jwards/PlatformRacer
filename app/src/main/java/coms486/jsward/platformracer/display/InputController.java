@@ -26,8 +26,6 @@ public class InputController implements View.OnTouchListener {
         int maskedAction = event.getAction() & MotionEvent.ACTION_MASK;
         int pointerCount = event.getPointerCount();
 
-        //bug: when secondary pointer is released, any button it's pressing will not be deactivated
-        //until the next MotionEvent.
         if (maskedAction == MotionEvent.ACTION_MOVE) {
             updateButtons(pointerCount,event);
         }

@@ -32,14 +32,13 @@ public class DrawLevel implements Drawable {
 
 
     private Player player;
+    private ArrayList<Player> otherPlayers;
     private Paint terrainPaint;
 
     private ArrayList<Bitmap> playerSprite;
-    private int animationFrame;
-    private int animationCounter;
     private Matrix playerMatrix;
-    private int playerSpriteCx;
-    private int playerSpriteCy;
+    private PlayerAnimator playerAnimator;
+
 
     private Point displaySize;
     private float scale;
@@ -52,10 +51,9 @@ public class DrawLevel implements Drawable {
 
     private float[] transformedPoints;
 
-
-    //1080x2076
-    public DrawLevel(Player player, ArrayList<Bitmap> playerSprite, Point displaySize){
+    public DrawLevel(Player player,ArrayList<Player> others, ArrayList<Bitmap> playerSprite, Point displaySize){
         this.player = player;
+        this.otherPlayers = others;
         this.playerSprite = playerSprite;
         this.displaySize = displaySize;
 
@@ -65,8 +63,7 @@ public class DrawLevel implements Drawable {
         viewMatrix = new Matrix();
         playerMatrix = new Matrix();
 
-        playerSpriteCx = playerSprite.get(0).getWidth()/2;
-        playerSpriteCy = playerSprite.get(0).getHeight() / 2;
+        playerAnimator = new PlayerAnimator(playerSprite, playerSprite.get(0).getWidth() / 2, playerSprite.get(0).getHeight() / 2);
 
         //view box in terms of game coords
         viewBox = new RectF(0, 0, 300, 150);
@@ -113,42 +110,17 @@ public class DrawLevel implements Drawable {
             canvas.drawRect(transformedPoints[i], transformedPoints[i+1], transformedPoints[i+2], transformedPoints[i+3], terrainPaint);
         }
 
-        drawPlayer(canvas,playerpt[1]);
-    }
+        playerAnimator.drawPlayer(player,canvas,playerMatrix,playerScale,PLAYER_X_OFFSET,playerpt[1]);
 
-    private void drawPlayer(Canvas canvas,float transformedpy){
-        playerMatrix.reset();
-        if (player.isFalling()) {
-            animationFrame = 5;
-        } else if (player.isMoving()) {
-            animationCounter++;
-            if(animationCounter >4){
-                animationCounter = 0;
-                animationFrame = indexLooper(animationFrame + 1, 1, 3);
+        if(otherPlayers!=null) {
+            for (Player p : otherPlayers) {
+                playerpt[0] = p.getX();
+                playerpt[1] = p.getY();
+                viewMatrix.mapPoints(playerpt);
+                //the player matrix is reset each time so we can resuse it
+                playerAnimator.drawPlayer(p, canvas, playerMatrix, playerScale,(int) playerpt[0], playerpt[1]);
             }
-
-            //display player facing in the correct direction
-            if (player.getVx() > 0) {
-                playerMatrix.setScale(1, 1, playerSpriteCx, playerSpriteCy);
-            } else {
-                playerMatrix.setScale(-1, 1, playerSpriteCx, playerSpriteCy);
-            }
-        } else {
-            animationFrame = 0;
-            animationCounter = 0;
         }
-        playerMatrix.postConcat(playerScale);
-        playerMatrix.postTranslate(PLAYER_X_OFFSET,transformedpy);
-        canvas.drawBitmap(playerSprite.get(animationFrame),playerMatrix,null);
     }
 
-    private int indexLooper(int nextIndex,int lowerBound,int upperBound){
-        if (nextIndex > upperBound) {
-            return lowerBound;
-        }
-        if (nextIndex < lowerBound) {
-            return upperBound;
-        }
-        return nextIndex;
-    }
 }

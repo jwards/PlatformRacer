@@ -31,7 +31,6 @@ public class NetworkThread extends Thread {
     //laptop
     private static final String SERVER_ADDR  = "desktop-rqgu2tp.student.iastate.edu";
 
-    private NetworkManager callback;
     private Socket socket;
     private ObjectInputStream objectInputStream;
     private ObjectOutputStream objectOutputStream;
@@ -39,15 +38,18 @@ public class NetworkThread extends Thread {
     private GameReceiveThread gameReceiveThread;
     private GameSendThread gameSendThread;
 
+    private GameCore gameCore;
+
     private boolean connectionAlive;
+    private boolean inGame;
 
     private PriorityQueue<NetRequest> requestQueue;
 
-    public NetworkThread(NetworkManager callback) {
+    public NetworkThread() {
         super();
-        this.callback = callback;
         requestQueue = new PriorityQueue<>();
         connectionAlive = false;
+        inGame = false;
     }
 
     @Override
@@ -114,6 +116,21 @@ public class NetworkThread extends Thread {
                         nextWait = 0;
                     }
                 }
+
+                if(inGame){
+                    //wait for gameCore to be set
+                    while(gameCore == null){
+                        wait();
+                    }
+
+                    beginGame(gameCore);
+
+                    //game has ended
+                    inGame = false;
+
+                }
+
+
             } catch (InterruptedException e) {
                 Log.d(DEBUG_TAG, Log.getStackTraceString(e));
             } catch (IOException e) {
@@ -155,9 +172,27 @@ public class NetworkThread extends Thread {
         requestQueue.clear();
     }
 
+    public synchronized void setGameCore(GameCore gameCore){
+        this.gameCore = gameCore;
+        notify();
+    }
+
 
     public boolean isConnected(){
         return connectionAlive;
+    }
+
+    //begins sending and requesting game updates
+    //will block until the game is done
+    private void beginGame(GameCore gameCore) throws IOException, InterruptedException {
+        gameReceiveThread = new GameReceiveThread(SERVER_UPDATE_RATE, objectInputStream, gameCore);
+        gameSendThread = new GameSendThread(CLIENT_INPUT_POLL_RATE, objectOutputStream, gameCore.getPlayerController());
+        //begin game communication
+        gameReceiveThread.start();
+        gameSendThread.start();
+
+        gameReceiveThread.join();
+        gameSendThread.join();
     }
 
 
@@ -235,7 +270,11 @@ public class NetworkThread extends Thread {
     private void onStartResponse(StartGamePacket response,LobbyUpdateRequest request){
         Log.d(DEBUG_TAG,"Received: "+response.status);
         if(response.status == Status.OK) {
+            //tell main thead game has begun
             request.getCallback().onGameStart();
+
+            //begin game communication
+            inGame = true;
         }
     }
 
@@ -272,14 +311,6 @@ public class NetworkThread extends Thread {
 
     }
 
-
-    private void beginGame(GameCore gameCore) throws IOException {
-        gameReceiveThread = new GameReceiveThread(SERVER_UPDATE_RATE, objectInputStream, gameCore);
-        gameSendThread = new GameSendThread(CLIENT_INPUT_POLL_RATE, objectOutputStream, gameCore.getPlayerController());
-        //begin game communication
-        gameReceiveThread.start();
-        gameSendThread.start();
-    }
 
     private void initNetwork(){
         try{

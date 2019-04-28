@@ -1,5 +1,6 @@
 package coms486.jsward.platformracer.network;
 
+import jsward.platformracer.common.game.GameCore;
 import jsward.platformracer.common.network.ReqType;
 
 public class NetworkManager {
@@ -8,7 +9,7 @@ public class NetworkManager {
     private NetworkThread networkThread;
 
     private NetworkManager(){
-        networkThread = new NetworkThread(this);
+        networkThread = new NetworkThread();
         networkThread.start();
     }
 
@@ -55,6 +56,10 @@ public class NetworkManager {
     public boolean reqStartGame(RequestStatusCallback callback){
         SimpleRequest request = new SimpleRequest(ReqType.REQ_START,callback);
         return networkThread.request(request);
+    }
+
+    public void beginGame(GameCore gameCore){
+        networkThread.setGameCore(gameCore);
     }
 
     public void cancleRequest(String requestId){

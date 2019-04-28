@@ -36,6 +36,12 @@ public class DisplayThread extends Thread {
         long totalTime = 0;
         long targetTime = 1000/MAX_FPS;
 
+        try {
+            sleep(1000);
+        } catch (InterruptedException e) {
+            Log.d(DEBUG_TAG, Log.getStackTraceString(e));
+        }
+
         running = true;
         display = true;
         while(display){

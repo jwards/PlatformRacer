@@ -17,6 +17,7 @@ import coms486.jsward.platformracer.display.DisplayThread;
 import coms486.jsward.platformracer.display.GameDisplay;
 import coms486.jsward.platformracer.display.SVButton;
 import coms486.jsward.platformracer.game.GameThread;
+import coms486.jsward.platformracer.network.NetworkManager;
 import jsward.platformracer.common.game.GameCore;
 import jsward.platformracer.common.game.PlatformLevel;
 import jsward.platformracer.common.game.PlayerController;
@@ -92,7 +93,7 @@ public class GameActivity extends AppCompatActivity {
 
 
         if(!isSinglePlayer){
-            //network stuff
+            NetworkManager.getInstance().beginGame(gameCore);
         }
         displaying = false;
 
@@ -152,7 +153,7 @@ public class GameActivity extends AppCompatActivity {
         }
 
         GameDrawer gameDrawer = new GameDrawer(gameDisplay);
-        DrawLevel levelDrawer = new DrawLevel(gameCore.getPlayer(), psprites,displaySize);
+        DrawLevel levelDrawer = new DrawLevel(gameCore.getPlayer(),gameCore.getOpponents(), psprites,displaySize);
         gameDrawer.addDrawable(levelDrawer);
 
         displayThread = new DisplayThread(gameDisplay.getHolder(), gameDrawer);

@@ -20,7 +20,7 @@ public class GameSendThread extends TickerThread {
     private PlayerController controller;
 
     public GameSendThread(int maxTPS, ObjectOutputStream objectOutputStream , PlayerController controller) throws IOException {
-        super(maxTPS,true,new AndroidLogger());
+        super(maxTPS,false,new AndroidLogger());
         out = objectOutputStream;
         gameInputPacket = new GameInputPacket();
         this.controller = controller;
