@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import coms486.jsward.platformracer.display.DrawLevel;
 import coms486.jsward.platformracer.display.GameDrawer;
@@ -16,6 +17,7 @@ import coms486.jsward.platformracer.display.InputController;
 import coms486.jsward.platformracer.display.DisplayThread;
 import coms486.jsward.platformracer.display.GameDisplay;
 import coms486.jsward.platformracer.display.SVButton;
+import coms486.jsward.platformracer.display.TimerDraw;
 import coms486.jsward.platformracer.game.GameThread;
 import coms486.jsward.platformracer.network.NetworkManager;
 import jsward.platformracer.common.game.GameCore;
@@ -38,6 +40,10 @@ public class GameActivity extends AppCompatActivity {
     private DisplayThread displayThread;
     private DrawLevel levelDrawer;
     private GameDrawer gameDrawer;
+    private TimerDraw timeDrawer;
+
+    private Date gameTime;
+
     private ArrayList<Bitmap> playerSprites;
 
     private static boolean displaying;
@@ -56,6 +62,9 @@ public class GameActivity extends AppCompatActivity {
 
     private final float B_RIGHT_X = 0.13f;
     private final float B_RIGHT_Y = 0.85f;
+
+    private final float TIME_X = .9f;
+    private final float TIME_Y = .08f;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -123,7 +132,8 @@ public class GameActivity extends AppCompatActivity {
 
     private void initGame(){
         PlatformLevel platformLevel = new PlatformLevel();
-        gameCore = new GameCore(platformLevel);
+        gameTime = new Date();
+        gameCore = new GameCore(platformLevel,gameTime);
         gameThread = new GameThread(GAME_LOOP_MAX_TPS,gameCore);
     }
 
@@ -158,6 +168,11 @@ public class GameActivity extends AppCompatActivity {
         }
 
         gameDrawer = new GameDrawer(gameDisplay);
+
+        timeDrawer = new TimerDraw((int)(displaySize.x * TIME_X), (int)(displaySize.y * TIME_Y), gameTime);
+
+        gameDrawer.addDrawable(timeDrawer);
+
         displayThread = new DisplayThread(gameDisplay.getHolder(), gameDrawer);
     }
 

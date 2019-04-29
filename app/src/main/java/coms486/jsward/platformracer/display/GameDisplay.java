@@ -75,6 +75,7 @@ public class GameDisplay extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     public void drawUI(Canvas canvas){
+        //draw buttons
         for (SVButton svb : buttons) {
             svb.draw(canvas);
         }

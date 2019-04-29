@@ -22,21 +22,26 @@ public class PlayerController {
     public PlayerController(PlatformLevel level,Player p){
         this.level = level;
         this.p = p;
+        checkX = p.getX();
+        checkY = p.getY();
     }
 
 
     public void tick(){
 
-        p.setVy(p.getVy()+GRAVITY);
-
         //every 150 units is a checkpoint
-        if(((int)p.getX())%150<20){
-            if (p.canJump()) {
+        if(((int)p.getX())%150<30){
+            if (!p.isFalling() && p.canJump()) {
                 //set the checkpoint when x is on the ground
                 checkX = p.getX();
                 checkY = p.getY();
             }
         }
+
+
+        //gravity
+        p.setVy(p.getVy()+GRAVITY);
+
 
         if(p.getY()>200){
             //when x has fallen, reset at checkpoint
@@ -47,15 +52,22 @@ public class PlayerController {
             jump();
         }
 
-        if ((p.controls & BUTTON_LEFT) != 0) {
-            move(-1);
-        } else if ((p.controls & BUTTON_RIGHT) != 0) {
-            move(1);
-        } else {
-            //decelerate if not moving
-            p.setVx(decay(p.getVx()));
-        }
+        if(p.getX() >= level.getEnd()) {
+            //float off when you are done with the level
+            p.setVy(p.getVy()-GRAVITY);
+            p.setVx(0);
 
+        } else {
+            //normal movement
+            if ((p.controls & BUTTON_LEFT) != 0) {
+                move(-1);
+            } else if ((p.controls & BUTTON_RIGHT) != 0) {
+                move(1);
+            } else {
+                //decelerate if not moving
+                p.setVx(decay(p.getVx()));
+            }
+        }
         //tick position
         level.detectCollision(p);
 
