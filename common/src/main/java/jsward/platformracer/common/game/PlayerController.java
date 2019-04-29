@@ -17,14 +17,31 @@ public class PlayerController {
     private PlatformLevel level;
     private Player p;
 
+    private float checkX,checkY;
+
     public PlayerController(PlatformLevel level,Player p){
         this.level = level;
         this.p = p;
     }
 
+
     public void tick(){
 
         p.setVy(p.getVy()+GRAVITY);
+
+        //every 150 units is a checkpoint
+        if(((int)p.getX())%150<20){
+            if (p.canJump()) {
+                //set the checkpoint when x is on the ground
+                checkX = p.getX();
+                checkY = p.getY();
+            }
+        }
+
+        if(p.getY()>200){
+            //when x has fallen, reset at checkpoint
+             p.setPosition(checkX,checkY);
+        }
 
         if ((p.controls & BUTTON_JUMP) != 0) {
             jump();

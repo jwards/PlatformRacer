@@ -98,7 +98,10 @@ public class GameActivity extends AppCompatActivity {
 
         if(isSinglePlayer){
             //if this is singleplayer this won't be called by the network thread so we call it here instead
+            gameCore.addPlayer(User.USER_ID);
+            gameCore.addPlayerController(User.USER_ID);
             onGameCoreInit();
+
         }
 
 
