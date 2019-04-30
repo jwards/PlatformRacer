@@ -4,8 +4,7 @@ import java.util.UUID;
 
 public class User {
 
-    //temporary id for users
-    public static final String USER_ID = UUID.randomUUID().toString();
+    public static String USER_ID;
 
     public User(){
 

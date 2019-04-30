@@ -9,3 +9,8 @@
 /build
 /captures
 .externalNativeBuild
+*.keystore
+*.secret
+*.pem
+*.jks
+*.bks

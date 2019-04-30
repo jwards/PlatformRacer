@@ -20,16 +20,12 @@ import jsward.platformracer.common.network.StartGamePacket;
 import jsward.platformracer.common.network.Status;
 
 
+import static jsward.platformracer.common.util.Constants.SERVER_ADDR;
 import static jsward.platformracer.common.util.Constants.SERVER_PORT;
 
 public class NetworkThread extends Thread {
 
     private static final String DEBUG_TAG = "NETWORK_THREAD";
-
-    //desktop
-    //private static final String SERVER_ADDR  = "desktop-93rq231.student.iastate.edu";
-    //laptop
-    private static final String SERVER_ADDR  = "desktop-rqgu2tp.student.iastate.edu";
 
     private Socket socket;
     private ObjectInputStream objectInputStream;
