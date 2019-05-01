@@ -91,7 +91,7 @@ public class LeaderboardActivity extends AppCompatActivity {
             //display name on the left and score on the right
             name.setText(scoredata.getPlayer().getName());
             score.setText(dateFormat.format(scoretime));
-            
+
             return layout;
         }
 

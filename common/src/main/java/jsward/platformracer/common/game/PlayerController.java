@@ -1,6 +1,8 @@
 package jsward.platformracer.common.game;
 
 
+import jsward.platformracer.common.util.ILogger;
+
 public class PlayerController {
 
     private static final String DEBUG_TAG = "PLAYER_CONTROLLER";
@@ -17,13 +19,12 @@ public class PlayerController {
     private PlatformLevel level;
     private Player p;
 
-    private float checkX,checkY;
+    private float checkpoint;
 
     public PlayerController(PlatformLevel level,Player p){
         this.level = level;
         this.p = p;
-        checkX = p.getX();
-        checkY = p.getY();
+        checkpoint = p.getX();
     }
 
 
@@ -33,8 +34,7 @@ public class PlayerController {
         if(((int)p.getX())%150<30){
             if (!p.isFalling() && p.canJump()) {
                 //set the checkpoint when x is on the ground
-                checkX = p.getX();
-                checkY = p.getY();
+                checkpoint = p.getX();
             }
         }
 
@@ -43,9 +43,10 @@ public class PlayerController {
         p.setVy(p.getVy()+GRAVITY);
 
 
-        if(p.getY()>200){
+        if(p.getY()>300){
             //when x has fallen, reset at checkpoint
-             p.setPosition(checkX,checkY);
+            p.setPosition(checkpoint, 25);
+            p.setCanJump(true);
         }
 
         if ((p.controls & BUTTON_JUMP) != 0) {
@@ -73,6 +74,32 @@ public class PlayerController {
 
     }
 
+    public float getX(){
+        return p.getX();
+    }
+
+    public float getY(){
+        return p.getY();
+    }
+
+    public void updatePosition(float x,float y,float timestep){
+        float dx = Math.abs(x - getX());
+        float dy = Math.abs(y - getY());
+        float newX = getX();
+        float newY = getY();
+        if (dx <= Math.abs(p.getVx()) + Math.abs(p.getAccel())) {
+            newX = x;
+        } else {
+            System.out.println("Bad X");
+        }
+        if(dy<=Math.abs(p.getVy()) + Math.abs(JUMP_SPEED)){
+            newY = y;
+        } else {
+            System.out.println("Bad Y");
+        }
+        p.setPosition(x,y);
+    }
+
     public long getControlsActive(){
         return p.controls;
     }
@@ -84,7 +111,6 @@ public class PlayerController {
     public String getId(){
         return p.getId();
     }
-
 
     private void jump(){
         if (p.canJump()) {

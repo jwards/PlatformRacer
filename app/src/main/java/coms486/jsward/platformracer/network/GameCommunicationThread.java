@@ -69,7 +69,8 @@ public class GameCommunicationThread extends TickerThread {
                     Player updated = gameUpdatePacket.players.get(i);
                     Player local = gameCore.getPlayer(updated.getId());
                     if (updated.getId().equals(User.USER_ID)) {
-                        gameCore.updateLocalPlayer(local, updated);
+                        //gameCore.updateLocalPlayer(local, updated);
+                        //controller.updatePosition(updated.getX(), updated.getY(), 1f / Constants.SERVER_UPDATE_RATE);
                     } else {
                         gameCore.updatePlayer(local, updated);
                     }
@@ -88,10 +89,12 @@ public class GameCommunicationThread extends TickerThread {
         }
     }
 
-    private void sendUpdate(long controls) {
+    private void sendUpdate(long controls,float x,float y) {
         try{
             output.reset();
             output.writeLong(controls);
+            output.writeFloat(x);
+            output.writeFloat(y);
             output.flush();
         } catch (IOException e) {
             Log.d(DEBUG_TAG, Log.getStackTraceString(e));
@@ -101,7 +104,7 @@ public class GameCommunicationThread extends TickerThread {
 
     @Override
     protected void tick() {
-        sendUpdate(controller.getControlsActive());
+        sendUpdate(controller.getControlsActive(), controller.getX(), controller.getY());
         readUpdate();
     }
 

@@ -82,11 +82,11 @@ public class GameCore {
     public void updatePlayer(Player toUpdate,Player reference){
         updateLocalPlayer(toUpdate, reference);
         toUpdate.controls = reference.controls;
+        toUpdate.setVy(reference.getVy());
+        toUpdate.setVx(reference.getVx());
     }
 
     public void updateLocalPlayer(Player toUpdate, Player reference) {
-        toUpdate.setVy(reference.getVy());
-        toUpdate.setVx(reference.getVx());
         toUpdate.setPosition(reference.getX(), reference.getY());
         toUpdate.setCanJump(reference.canJump());
     }
