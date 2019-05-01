@@ -8,7 +8,8 @@
         android:id="@+id/lobby_entry_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:textSize="20dp"/>
+        android:gravity="center"
+        android:clickable="false"
+        android:textSize="28dp"/>
 
 </LinearLayout>

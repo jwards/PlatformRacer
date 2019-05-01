@@ -15,6 +15,7 @@ import jsward.platformracer.common.game.GameCore;
 import jsward.platformracer.common.network.CreateGamePacket;
 import jsward.platformracer.common.network.JoinGamePacket;
 import jsward.platformracer.common.network.LobbyPacket;
+import jsward.platformracer.common.network.LoginPacket;
 import jsward.platformracer.common.network.ReqType;
 import jsward.platformracer.common.network.StartGamePacket;
 import jsward.platformracer.common.network.Status;
@@ -51,8 +52,6 @@ public class NetworkThread extends Thread {
     @Override
     public synchronized void run() {
         Log.d(DEBUG_TAG,"Network thread runnning...");
-        initNetwork();
-
         long nextWait = 0;
 
         //lobby communication
@@ -173,9 +172,37 @@ public class NetworkThread extends Thread {
         notify();
     }
 
-
     public boolean isConnected(){
         return connectionAlive;
+    }
+
+    //this class should be refactored to make the login process less hackish
+    public synchronized LoginPacket login(LoginPacket loginPacket){
+        if(!connectionAlive){
+            initNetwork();
+        }
+        try {
+            objectOutputStream.writeUnshared(loginPacket);
+            objectOutputStream.flush();
+            Object obj = objectInputStream.readUnshared();
+            if(obj instanceof LoginPacket){
+                if(((LoginPacket) obj).isValid())
+                    this.start();
+                return (LoginPacket) obj;
+            } else {
+                Log.d(DEBUG_TAG, "ERROR: Received " + obj.toString());
+                return new LoginPacket("", "", false);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            //try reconnecting
+            initNetwork();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            //try reconnecting
+            initNetwork();
+        }
+        return null;
     }
 
     //begins sending and requesting game updates
@@ -318,15 +345,36 @@ public class NetworkThread extends Thread {
 
     private void initNetwork(){
         try{
+            //close any existing connections
+            try {
+                if (socket != null) {
+                    socket.close();
+                }
+            } catch (IOException e){
+
+            }
+
+            try {
+                if (objectOutputStream != null) {
+                    objectOutputStream.close();
+                }
+            } catch (IOException e){
+
+            }
+            try {
+                if (objectInputStream != null) {
+                    objectInputStream.close();
+                }
+            } catch (IOException e){
+
+            }
+
             Log.d(DEBUG_TAG, "Attempting to connect to " + SERVER_ADDR + ":" + SERVER_PORT);
             socket = new Socket();
             socket.connect(new InetSocketAddress(SERVER_ADDR,SERVER_PORT),1000);
             if(socket.isConnected()) {
                 objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
                 objectInputStream = new ObjectInputStream(socket.getInputStream());
-                objectOutputStream.flush();
-                //every time we connect, we let the server know who we are
-                objectOutputStream.writeUnshared(User.USER_ID);
                 objectOutputStream.flush();
 
                 Log.d(DEBUG_TAG, "Connection successful");

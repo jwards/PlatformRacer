@@ -20,7 +20,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -30,16 +29,12 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import java.io.IOException;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.List;
 
-import coms486.jsward.platformracer.network.SecureLogin;
+import coms486.jsward.platformracer.network.NetworkManager;
 import jsward.platformracer.common.network.LoginPacket;
 
 import static android.Manifest.permission.READ_CONTACTS;
@@ -72,7 +67,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         // Set up the login form.
-        mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
+        mEmailView = (AutoCompleteTextView) findViewById(R.id.username);
         populateAutoComplete();
 
         mPasswordView = (EditText) findViewById(R.id.password);
@@ -160,7 +155,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         View focusView = null;
 
         // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
+        if (!isPasswordValid(password)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
@@ -304,44 +299,22 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            boolean status = false;
-
-            SecureLogin login = null;
-            try {
-                login = new SecureLogin(getApplicationContext());
-            } catch (KeyStoreException e) {
-                Log.d(DEBUG_TAG, Log.getStackTraceString(e));
-            } catch (CertificateException e) {
-                Log.d(DEBUG_TAG, Log.getStackTraceString(e));
-            } catch (NoSuchAlgorithmException e) {
-                Log.d(DEBUG_TAG, Log.getStackTraceString(e));
-            } catch (IOException e) {
-                Log.d(DEBUG_TAG, Log.getStackTraceString(e));
-            } catch (KeyManagementException e) {
-                Log.d(DEBUG_TAG, Log.getStackTraceString(e));
-            }
-
-            try {
-                login.connect();
-
-                LoginPacket result = login.authenticate(new LoginPacket(username,mPassword));
-
-                status = result.getUserid().length() != 0;
-
-                if (status) {
-                    User.USER_ID = result.getUserid();
+            LoginPacket response = NetworkManager.getInstance().authenticate(new LoginPacket(username, mPassword));
+            if(response != null){
+                if (response.isValid()) {
+                    User.USER_ID = response.getUserid();
+                    User.USER_NAME = response.getUsername();
+                    return true;
                 }
-
-            } catch (IOException e) {
-                Log.d(DEBUG_TAG, Log.getStackTraceString(e));
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            } finally {
-                login.disconnect();
+            } else {
+                LoginActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(LoginActivity.this, "Network error", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
-
-
-            return status;
+            return false;
         }
 
         @Override

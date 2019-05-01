@@ -2,6 +2,7 @@ package coms486.jsward.platformracer.network;
 
 import coms486.jsward.platformracer.GameActivity;
 import jsward.platformracer.common.game.GameCore;
+import jsward.platformracer.common.network.LoginPacket;
 import jsward.platformracer.common.network.ReqType;
 
 public class NetworkManager {
@@ -11,7 +12,6 @@ public class NetworkManager {
 
     private NetworkManager(){
         networkThread = new NetworkThread();
-        networkThread.start();
     }
 
     public synchronized static NetworkManager getInstance() {
@@ -19,6 +19,11 @@ public class NetworkManager {
             INSTANCE = new NetworkManager();
         }
         return INSTANCE;
+    }
+
+    //called to create the connection
+    public LoginPacket authenticate(LoginPacket credentials){
+        return networkThread.login(credentials);
     }
 
     public boolean reqLobbyList(LobbyReqCallback callback,int lobbyId){

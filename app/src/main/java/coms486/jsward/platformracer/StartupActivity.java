@@ -21,13 +21,9 @@ public class StartupActivity extends AppCompatActivity {
         Button leaderButton = findViewById(R.id.startup_leaderboard);
         leaderButton.setTag(2);
 
-        Button testButton = findViewById(R.id.startup_test);
-        testButton.setTag(3);
-
         ButtonListener buttonListener = new ButtonListener();
         startButton.setOnClickListener(buttonListener);
         leaderButton.setOnClickListener(buttonListener);
-        testButton.setOnClickListener(buttonListener);
 
         //connect to network
         NetworkManager networkManager = NetworkManager.getInstance();
@@ -50,9 +46,6 @@ public class StartupActivity extends AppCompatActivity {
                 case 2:
                     //open leaderboards
                     //TODO
-                    break;
-                case 3:
-                    //test
                     break;
             }
         }

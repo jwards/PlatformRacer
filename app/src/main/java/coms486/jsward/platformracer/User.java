@@ -1,10 +1,11 @@
 package coms486.jsward.platformracer;
 
-import java.util.UUID;
 
 public class User {
 
-    public static String USER_ID;
+    //initilize to offline
+    public static String USER_ID = "offline";
+    public static String USER_NAME = "offline";
 
     public User(){
 

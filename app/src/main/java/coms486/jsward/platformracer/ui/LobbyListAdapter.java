@@ -61,7 +61,7 @@ public class LobbyListAdapter extends BaseAdapter {
         if(gameSessionInfo == null){
             name.setText("Empty");
         } else {
-            name.setText(gameSessionInfo.lobbyId +" : "+gameSessionInfo.hostPlayerId + " : "+gameSessionInfo.capacity+"/"+gameSessionInfo.maxCapacity);
+            name.setText(gameSessionInfo.lobbyId +" : "+gameSessionInfo.hostPlayer + " : "+gameSessionInfo.capacity+"/"+gameSessionInfo.maxCapacity);
         }
         view.setTag(position);
         return view;

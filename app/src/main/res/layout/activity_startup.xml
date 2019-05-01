@@ -9,7 +9,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="50dp"
-        android:text="HELLO WORLD"
+        android:text="WELCOME"
         android:layout_gravity="center_horizontal"/>
 
     <Button
@@ -24,12 +24,7 @@
         android:layout_gravity="center_horizontal"
         android:text="Leaderboard"
         android:id="@+id/startup_leaderboard"/>
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="Test"
-        android:id="@+id/startup_test"/>
+
 
 
 </LinearLayout>

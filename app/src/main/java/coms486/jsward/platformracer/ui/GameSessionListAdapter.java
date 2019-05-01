@@ -5,6 +5,7 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -45,8 +46,7 @@ class GameSessionListAdapter extends BaseAdapter {
             //for title card
             count += 1;
             //if host add one for the host card
-            //TODO use real player ID
-            if(sessionInfo.isHost(sessionInfo.hostPlayerId)) {
+            if(sessionInfo.isHost(sessionInfo.hostPlayer.getId())) {
                 count+=1;
             }
             return count;
@@ -58,7 +58,7 @@ class GameSessionListAdapter extends BaseAdapter {
     @Override
     public Object getItem(int position) {
         if(sessionInfo != null) {
-            return sessionInfo.players.get(position);
+            return sessionInfo.players.get(position).getName();
         } else {
             return null;
         }
@@ -119,7 +119,7 @@ class GameSessionListAdapter extends BaseAdapter {
         if(playerName == null){
             name.setText("Empty");
         } else {
-            if(playerPosition== sessionInfo.hostPlayerId){
+            if(playerName.equals(sessionInfo.hostPlayer.getName())){
                 name.setTextColor(Color.RED);
             } else {
                 name.setTextColor(Color.DKGRAY);
