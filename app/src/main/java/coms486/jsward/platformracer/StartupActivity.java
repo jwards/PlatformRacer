@@ -45,7 +45,7 @@ public class StartupActivity extends AppCompatActivity {
                     break;
                 case 2:
                     //open leaderboards
-                    //TODO
+                    launch(LeaderboardActivity.class);
                     break;
             }
         }

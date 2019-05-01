@@ -11,9 +11,11 @@ import java.util.PriorityQueue;
 
 import coms486.jsward.platformracer.GameActivity;
 import coms486.jsward.platformracer.User;
+import coms486.jsward.platformracer.ui.LeaderboardCallback;
 import jsward.platformracer.common.game.GameCore;
 import jsward.platformracer.common.network.CreateGamePacket;
 import jsward.platformracer.common.network.JoinGamePacket;
+import jsward.platformracer.common.network.LeaderBoardPacket;
 import jsward.platformracer.common.network.LobbyPacket;
 import jsward.platformracer.common.network.LoginPacket;
 import jsward.platformracer.common.network.ReqType;
@@ -99,6 +101,8 @@ public class NetworkThread extends Thread {
                                 case REQ_START:
                                     sendStartRequest((SimpleRequest) request);
                                     break;
+                                case REQ_LEADERBOARD:
+                                    sendLeaderboardRequest(request);
                             }
                         } else{
                             nextWait = requestQueue.peek().getWaitTime();
@@ -225,6 +229,15 @@ public class NetworkThread extends Thread {
 
         gameCommunicationThread.join();
     }
+
+    private void sendLeaderboardRequest(NetRequest request) throws IOException, ClassNotFoundException {
+        Log.d(DEBUG_TAG, "Sending Leaderboard Request...");
+        objectOutputStream.writeUnshared(new LeaderBoardPacket());
+
+        LeaderBoardPacket response = (LeaderBoardPacket) objectInputStream.readUnshared();
+        ((LeaderboardCallback) request.getCallback()).onLeaderboardUpdate(response.scores);
+    }
+
 
 
     private void sendLobbyRequest(LobbyUpdateRequest req) throws IOException, ClassNotFoundException {

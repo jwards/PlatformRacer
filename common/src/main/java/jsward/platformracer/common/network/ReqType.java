@@ -9,8 +9,8 @@ public enum ReqType {
     REQ_JOIN,
     REQ_CREATE,
     REQ_DESTROY,
-    REQ_START;
-
+    REQ_START,
+    REQ_LEADERBOARD;
 
     private static Map<Integer, ReqType> map = new HashMap<>();
 

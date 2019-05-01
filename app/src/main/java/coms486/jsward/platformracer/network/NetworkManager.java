@@ -1,7 +1,9 @@
 package coms486.jsward.platformracer.network;
 
 import coms486.jsward.platformracer.GameActivity;
+import coms486.jsward.platformracer.ui.LeaderboardCallback;
 import jsward.platformracer.common.game.GameCore;
+import jsward.platformracer.common.network.LeaderBoardPacket;
 import jsward.platformracer.common.network.LoginPacket;
 import jsward.platformracer.common.network.ReqType;
 
@@ -62,6 +64,20 @@ public class NetworkManager {
     public boolean reqStartGame(RequestStatusCallback callback){
         SimpleRequest request = new SimpleRequest(ReqType.REQ_START,callback);
         return networkThread.request(request);
+    }
+
+    public boolean reqLeaderBoard(final LeaderboardCallback callback) {
+        return networkThread.request(new NetRequest(ReqType.REQ_LEADERBOARD,0,0) {
+            @Override
+            public LeaderboardCallback getCallback() {
+                return callback;
+            }
+
+            @Override
+            public String toString() {
+                return callback.toString();
+            }
+        });
     }
 
     public void beginGame(GameCore gameCore, GameActivity gamecoreInitCallback){
