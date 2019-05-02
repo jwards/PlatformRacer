@@ -40,6 +40,7 @@ public abstract class TickerThread extends Thread {
         long targetTime = 1000 / MAX_TPS;
 
         running = true;
+        onBegin();
         while (running) {
             startTime = System.nanoTime();
 
@@ -65,6 +66,11 @@ public abstract class TickerThread extends Thread {
                 if (LOG_TPS) logger.logMessage(DEBUG_TAG, "TPS: " + averageTPS);
             }
         }
+
+    }
+
+    //called when this thread begins running
+    protected void onBegin(){
 
     }
 

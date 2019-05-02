@@ -1,10 +1,7 @@
 package jsward.platformracer.common.game;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 
 import jsward.platformracer.common.network.GameUpdatePacket;
 
@@ -16,6 +13,7 @@ public class GameCore {
 
     private Date gameTime;
     private long startTime = 0;
+    private boolean started = false;
 
     private PlatformLevel platformLevel;
 
@@ -63,12 +61,19 @@ public class GameCore {
 
     public void onGameStart(){
         startTime = System.currentTimeMillis();
+        started = true;
+    }
+
+    public long getTime(){
+        return gameTime.getTime();
     }
 
     public void tick(){
-        gameTime.setTime(System.currentTimeMillis()-startTime);
-        for (PlayerController pc : controllers) {
-            pc.tick();
+        if(started) {
+            gameTime.setTime(System.currentTimeMillis() - startTime);
+            for (PlayerController pc : controllers) {
+                pc.tick();
+            }
         }
     }
 

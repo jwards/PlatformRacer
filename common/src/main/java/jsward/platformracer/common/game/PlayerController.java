@@ -53,7 +53,7 @@ public class PlayerController {
             jump();
         }
 
-        if(p.getX() >= level.getEnd()) {
+        if(atEndOfLevel()) {
             //float off when you are done with the level
             p.setVy(p.getVy()-GRAVITY);
             p.setVx(0);
@@ -98,6 +98,10 @@ public class PlayerController {
             System.out.println("Bad Y");
         }
         p.setPosition(x,y);
+    }
+
+    public boolean atEndOfLevel(){
+        return p.getX() >= level.getEnd();
     }
 
     public long getControlsActive(){

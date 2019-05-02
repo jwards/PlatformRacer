@@ -9,6 +9,7 @@ import java.net.Socket;
 import java.util.function.ObjIntConsumer;
 
 import coms486.jsward.platformracer.AndroidLogger;
+import coms486.jsward.platformracer.GameActivity;
 import coms486.jsward.platformracer.User;
 import jsward.platformracer.common.game.Player;
 import jsward.platformracer.common.game.PlayerController;
@@ -24,6 +25,7 @@ public class GameCommunicationThread extends TickerThread {
     private ObjectInputStream input;
     private ObjectOutputStream output;
 
+    private GameActivity callback;
     private GameCore gameCore;
     private PlayerController controller;
 
@@ -31,8 +33,9 @@ public class GameCommunicationThread extends TickerThread {
 
     private int counter;
 
-    public GameCommunicationThread(ObjectInputStream objectInputStream, ObjectOutputStream objectOutputStream, GameCore gameCore) throws IOException {
+    public GameCommunicationThread(ObjectInputStream objectInputStream, ObjectOutputStream objectOutputStream, GameCore gameCore, GameActivity callback) throws IOException {
         super(Constants.SERVER_UPDATE_RATE,false,new AndroidLogger());
+        this.callback = callback;
         this.gameCore = gameCore;
         input = objectInputStream;
         output = objectOutputStream;
@@ -103,9 +106,23 @@ public class GameCommunicationThread extends TickerThread {
     }
 
     @Override
+    protected void onBegin() {
+        gameCore.onGameStart();
+    }
+
+    @Override
     protected void tick() {
         sendUpdate(controller.getControlsActive(), controller.getX(), controller.getY());
         readUpdate();
+        try{
+            if (input.readInt() == 1) {
+                long score = input.readLong();
+                callback.onGameEnd(score);
+                hault();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

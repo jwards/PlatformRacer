@@ -40,6 +40,7 @@ public class GameSelectController implements RequestStatusCallback, LobbyReqCall
 
     public void onSinglePlayerClick(){
         if(isLobbySelecting) {
+            netman.cancleAll();
             startGame(true);
         }
     }

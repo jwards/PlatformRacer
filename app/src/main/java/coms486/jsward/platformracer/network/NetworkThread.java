@@ -122,7 +122,7 @@ public class NetworkThread extends Thread {
                         wait(250);
                     }
 
-                    beginGame(gameCore);
+                    beginGame(gameActivity,gameCore);
 
                     //game has ended
                     inGame = false;
@@ -185,7 +185,11 @@ public class NetworkThread extends Thread {
         if(!connectionAlive){
             initNetwork();
         }
+        if(!connectionAlive){
+            return null;
+        }
         try {
+
             objectOutputStream.writeUnshared(loginPacket);
             objectOutputStream.flush();
             Object obj = objectInputStream.readUnshared();
@@ -211,8 +215,8 @@ public class NetworkThread extends Thread {
 
     //begins sending and requesting game updates
     //will block until the game is done
-    private void beginGame(GameCore gameCore) throws IOException, InterruptedException {
-        gameCommunicationThread = new GameCommunicationThread(objectInputStream,objectOutputStream, gameCore);
+    private void beginGame(GameActivity activity,GameCore gameCore) throws IOException, InterruptedException {
+        gameCommunicationThread = new GameCommunicationThread(objectInputStream,objectOutputStream, gameCore,activity);
 
         //receive game init info
         //this loads the player and player controller data into the local gamecore
@@ -228,6 +232,9 @@ public class NetworkThread extends Thread {
         gameCommunicationThread.start();
 
         gameCommunicationThread.join();
+
+        //game has ended so set it to null
+        this.gameCore = null;
     }
 
     private void sendLeaderboardRequest(NetRequest request) throws IOException, ClassNotFoundException {

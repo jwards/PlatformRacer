@@ -1,13 +1,17 @@
 package coms486.jsward.platformracer;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -103,14 +107,12 @@ public class GameActivity extends AppCompatActivity {
 
         if(!isSinglePlayer){
             NetworkManager.getInstance().beginGame(gameCore,this);
-        }
-
-        if(isSinglePlayer){
+        } else {
             //if this is singleplayer this won't be called by the network thread so we call it here instead
             gameCore.addPlayer(User.USER_ID);
             gameCore.addPlayerController(User.USER_ID);
             onGameCoreInit();
-
+            gameCore.onGameStart();
         }
 
 
@@ -134,7 +136,7 @@ public class GameActivity extends AppCompatActivity {
         PlatformLevel platformLevel = new PlatformLevel();
         gameTime = new Date();
         gameCore = new GameCore(platformLevel,gameTime);
-        gameThread = new GameThread(GAME_LOOP_MAX_TPS,gameCore);
+        gameThread = new GameThread(GAME_LOOP_MAX_TPS,gameCore,this);
     }
 
     private void readIntent(Intent intent){
@@ -181,6 +183,35 @@ public class GameActivity extends AppCompatActivity {
         gameDisplay.setOnTouchListener(controller);
     }
 
+    public void onGameEnd(final long score){
+        Log.d(DEBUG_TAG, "Finished game with score " + score);
+
+        //clean up threads
+        //this makes the onDestroy() redundant
+        gameThread.hault();
+        displayThread.stopDisplay();
+
+        //display dialog with score
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Date date = new Date(score);
+                DateFormat format = new SimpleDateFormat("mm:ss.SS");
+                new AlertDialog.Builder(GameActivity.this)
+                        .setTitle("Game Complete")
+                        .setMessage("You completed the level in " + format.format(date))
+                        .setCancelable(false)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                GameActivity.this.finish();
+                            }
+                        }).create().show();
+            }
+        });
+
+    }
+
     //called when the game core has been updated with the player info from the server
     public void onGameCoreInit(){
         levelDrawer = new DrawLevel(playerSprites,displaySize);
@@ -196,4 +227,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
 
+    public boolean isSinglePlayer() {
+        return isSinglePlayer;
+    }
 }
