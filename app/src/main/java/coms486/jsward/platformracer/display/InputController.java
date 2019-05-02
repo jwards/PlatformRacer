@@ -41,7 +41,7 @@ public class InputController implements View.OnTouchListener {
             pointDown[1] = event.getY(event.getActionIndex());
             playerController.deactivate(getButton(pointDown));
         }
-
+        
         return false;
     }
 

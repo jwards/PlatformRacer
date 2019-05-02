@@ -53,22 +53,17 @@ public class PlayerController {
             jump();
         }
 
-        if(atEndOfLevel()) {
-            //float off when you are done with the level
-            p.setVy(p.getVy()-GRAVITY);
-            p.setVx(0);
 
+        //normal movement
+        if ((p.controls & BUTTON_LEFT) != 0) {
+            move(-1);
+        } else if ((p.controls & BUTTON_RIGHT) != 0) {
+            move(1);
         } else {
-            //normal movement
-            if ((p.controls & BUTTON_LEFT) != 0) {
-                move(-1);
-            } else if ((p.controls & BUTTON_RIGHT) != 0) {
-                move(1);
-            } else {
-                //decelerate if not moving
-                p.setVx(decay(p.getVx()));
-            }
+            //decelerate if not moving
+            p.setVx(decay(p.getVx()));
         }
+
         //tick position
         level.detectCollision(p);
 
@@ -90,12 +85,12 @@ public class PlayerController {
         if (dx <= Math.abs(p.getVx()) + Math.abs(p.getAccel())) {
             newX = x;
         } else {
-            System.out.println("Bad X");
+           // System.out.println("Bad X");
         }
         if(dy<=Math.abs(p.getVy()) + Math.abs(JUMP_SPEED)){
             newY = y;
         } else {
-            System.out.println("Bad Y");
+           // System.out.println("Bad Y");
         }
         p.setPosition(x,y);
     }
